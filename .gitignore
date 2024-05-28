@@ -1,5 +1,6 @@
 # data_cs
 data_cs/*
+!data_cs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
