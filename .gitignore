@@ -1,6 +1,8 @@
 # data_cs
-data_cs/*
-!data_cs
+data_cs/SemEval2010/*
+data_cs/Schutz2008/*
+data_cs/wicc/*
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
