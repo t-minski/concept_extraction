@@ -1,7 +1,7 @@
 # concept_extraction
 
 # data_cs
-Reference](https://github.com/LIAAD/KeywordExtractor-Datasets/tree/master)
+[Reference](https://github.com/LIAAD/KeywordExtractor-Datasets/tree/master)
 
 Download the three datasets and unzip them in data_cs directory
 
@@ -12,7 +12,6 @@ Download the three datasets and unzip them in data_cs directory
 | [__wicc__](#wicc)               | ES       | Paper           | Comp. Science | 1640   | 7498 (4.57)          | 1955.56         | 2.7%           |
 <!--| [__KWTweet__](#KWTweet)         | EN       | Tweets          | Misc.         | 7736  | 31759 (4.12)         | 19.79           | 7.87%          |-->
 
-<br><br>
 ---
 <a name="Schutz"></a>
 ### Schutz2008
