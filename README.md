@@ -7,21 +7,20 @@ Download the three datasets and unzip them in data_cs directory
 
 | Dataset                         | Language | Type of Doc     | Domain        | #Docs  | #Gold Keys (per doc) | #Tokens per doc | Absent GoldKey | 
 | ------------------------------- | -------- | --------------- | ------------- | -----  | -------------------- | --------------- | -------------- |
-| [__Schutz2008__](#Schutz)       | EN       | Paper           | Comp. Science | 1231   | 55013 (44.69)        | 3901.31         | 13.6%          |
+| [__Inspec__](#Inspec)           | EN       | Abstract        | Comp. Science | 2000   | 29230 (14.62)        | 128.20          | 37.7%          |
 | [__SemEval2010__](#SemEval2010) | EN       | Paper           | Comp. Science | 243    | 4002 (16.47)         | 8332.34         | 11.3%          |
-| [__wicc__](#wicc)               | ES       | Paper           | Comp. Science | 1640   | 7498 (4.57)          | 1955.56         | 2.7%           |
+| [__www__](#www)                 | EN       | Paper           | Comp. Science | 1330   | 7711 (5.80)          | 84.08           | 55.0%          |
 <!--| [__KWTweet__](#KWTweet)         | EN       | Tweets          | Misc.         | 7736  | 31759 (4.12)         | 19.79           | 7.87%          |-->
 
 ---
-<a name="Schutz"></a>
-### Schutz2008
+<a name="Inspec"></a>
+### Inspec
 
-**Dateset**: [Schutz2008](datasets/Schutz2008.zip)
+**Dateset**: [Inspec](datasets/Inspec.zip)
 
-**Cite**: [Keyphrase Extraction from Single Documents in the Open Domain Exploiting Linguistic and Statistical Methods](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.394.5372&rep=rep1&type=pdf)
+**Cite**: [Improved automatic keyword extraction given more linguistic knowledge](https://dl.acm.org/citation.cfm?id=1119383)
 
-**Description**: Schutz2008 dataset is based on full-text papers collected from PubMed Central, which comprises over 26 million citations for biomedical literature from MEDLINE, life science journals, and online books. It consists of 1,231 papers selected from PubMed Central that the documents are distributed across 254 different journals, ranging from Abdominal Imaging to World
-Journal of Urology. These keywords assigned by the authors are hidden in the article and used as gold keywords.
+**Description**: Inspec consists of 2,000 abstracts of scientific journal papers from Computer Science collected between the years 1998 and 2002. Each document has two sets of keywords assigned: the controlled keywords, which are manually controlled assigned keywords that appear in the Inspec thesaurus but may not appear in the document, and the uncontrolled keywords which are freely assigned by the editors, i.e., are not restricted to the thesaurus or to the document. In our repository, we consider a union of both sets as the ground-truth.
 
 ---
 
@@ -35,13 +34,13 @@ Journal of Urology. These keywords assigned by the authors are hidden in the art
 **Description**: SemEval2010 consists of 244 full scientific papers extracted from the ACM Digital Library (one of the most popular datasets which have been previously used for keyword extraction evaluation), each one ranging from 6 to 8 pages and belonging to four different computer science research areas (distributed systems; information search and retrieval; distributed artificial intelligence – multiagent systems; social and behavioral sciences – economics). Each paper has an author-assigned set of keywords (which are part of the original pdf file) and a set of keywords assigned by professional editors, both of which, may or may not appear explicitly in the text.
 
 ---
-<a name="wicc"></a>
-### wicc
+<a name="www"></a>
+### www
 
-**Dateset**: [wicc](datasets/wicc.zip)
+**Dateset**: [www](datasets/www.zip)
 
-**Cite**: [Keyword Identification in Spanish Documents using Neural Networks](http://sedici.unlp.edu.ar/handle/10915/50087)
+**Cite**: [Extracting Keyphrases from Research Papers using Citation Networks](https://www.aaai.org/ocs/index.php/AAAI/AAAI14/paper/viewFile/8662/8618)
 
-**Description**: The wicc dataset is composed of 1640 scientific articles published between 1999 and 2012 of the Workshop of Researchers in Computer Science [WICC](http://redunci.info.unlp.edu.ar/wicc.html). 
+**Description**: the WWW collection is based on the abstracts of papers collected from the World Wide Web Conference (WWW) published during the period 2004-2014, with 1330 documents. The gold-keywords of these papers are the author-labeled terms. 
 
 ---
