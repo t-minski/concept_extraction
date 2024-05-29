@@ -1,22 +1,4 @@
 # %%
-%%capture
-!pip install --upgrade git+https://github.com/UKPLab/sentence-transformers
-!pip install keybert ctransformers[cuda]
-!pip install --upgrade git+https://github.com/huggingface/transformers
-!pip install spacy
-!pip install yake
-!pip install gensim
-!pip install pyate
-!pip install rake-nltk
-!pip install summa
-!python -m spacy download en_core_web_sm
-!pip install keybert
-!pip install huggingface_hu==0.10.1
-!pip install bibtexparser
-!pip install Levenshtein
-!pip install fuzzywuzzy
-
-# %%
 import csv
 import os
 from ctransformers import AutoModelForCausalLM as CAutoModelForCausalLM
@@ -102,13 +84,13 @@ def extract_keywords_from_abstract(abstract):
     abstract = abstract.lower()
 
     # Mixtral7B_zero_shot
-    llm_mistral = TextGeneration(generator_mixtral, prompt=prompt_zero_shot)
+    llm_mixtral = TextGeneration(generator_mixtral, prompt=prompt_zero_shot)
     kw_model_mixtral = KeyBERT(llm=llm_mixtral, model='BAAI/bge-small-en-v1.5')
     raw_keywords = kw_model_mixtral.extract_keywords([abstract], threshold=0.5)[0]
     cleaned_keywords_zero_shot = [keyword.rstrip('.') for keyword in raw_keywords if keyword.rstrip('.').lower() in abstract.lower()]
     
     # Mixtral7B_one_shot
-    llm_mistral = TextGeneration(generator_mixtral, prompt=prompt_one_shot)
+    llm_mixtral = TextGeneration(generator_mixtral, prompt=prompt_one_shot)
     kw_model_mixtral = KeyBERT(llm=llm_mixtral, model='BAAI/bge-small-en-v1.5')
     raw_keywords = kw_model_mixtral.extract_keywords([abstract], threshold=0.5)[0]
     cleaned_keywords_one_shot = [keyword.rstrip('.') for keyword in raw_keywords if keyword.rstrip('.').lower() in abstract.lower()]

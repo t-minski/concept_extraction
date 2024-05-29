@@ -1,15 +1,4 @@
 # %%
-%%capture
-!pip install spacy
-!pip install yake
-!pip install gensim
-!pip install pyate
-!pip install rake-nltk
-!pip install summa
-!pip install Levenshtein
-!pip install fuzzywuzzy
-
-# %%
 import csv
 import os
 from yake import KeywordExtractor

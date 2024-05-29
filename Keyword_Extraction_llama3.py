@@ -1,22 +1,4 @@
 # %%
-%%capture
-!pip install --upgrade git+https://github.com/UKPLab/sentence-transformers
-!pip install keybert ctransformers[cuda]
-!pip install --upgrade git+https://github.com/huggingface/transformers
-!pip install spacy
-!pip install yake
-!pip install gensim
-!pip install pyate
-!pip install rake-nltk
-!pip install summa
-!python -m spacy download en_core_web_sm
-!pip install keybert
-!pip install huggingface_hu==0.10.1
-!pip install bibtexparser
-!pip install Levenshtein
-!pip install fuzzywuzzy
-
-# %%
 import csv
 import os
 from ctransformers import AutoModelForCausalLM as CAutoModelForCausalLM
