@@ -1,7 +1,7 @@
 # data_cs
 data_cs/SemEval2010/*
-data_cs/Inspec/*
-data_cs/www/*
+data_cs/Krapivin2009/*
+data_cs/SemEval2017/*
 
 # logs
 *.log

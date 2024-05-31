@@ -206,9 +206,9 @@ def read_files_from_directory(base_path, dataset):
     for filename in os.listdir(docs_path):
         if filename.endswith('.txt'):
             with open(os.path.join(docs_path, filename), 'r', encoding='utf-8') as file:
-                if dataset == 'SemEval2010':
+                if dataset == 'Krapivin2009':
                     content = file.read()
-                    abstract = extract_semeval_abstract(content)
+                    abstract = extract_krapivin_abstract(content)
                 else:
                     abstract = file.read().strip()
                 #abstracts[identifier] = abstract
@@ -220,14 +220,14 @@ def read_files_from_directory(base_path, dataset):
                 keywords.append([line.strip() for line in file.readlines()])
     return abstracts, keywords
 
-def extract_semeval_abstract(content):
+def extract_krapivin_abstract(content):
     lines = content.split('\n')
     abstract_lines = []
     in_abstract = False
     for line in lines:
-        if line.startswith('ABSTRACT'):
+        if line.strip() == '--A':
             in_abstract = True
-        elif line.startswith('Categories and Subject Descriptors'):
+        elif line.strip() == '--B':
             in_abstract = False
         elif in_abstract:
             abstract_lines.append(line.strip())
@@ -291,7 +291,7 @@ extraction_functions = {
 
 # %%
 base_path = 'data_cs'
-datasets = ['Inspec', 'SemEval2010', 'www']
+datasets = ['SemEval2017', 'SemEval2010', 'Krapivin2009']
 
 output_folder = 'output'
 evaluate_keywords_from_data(base_path, datasets, extraction_functions, output_folder)
