@@ -245,7 +245,7 @@ def evaluate_keywords_from_data(base_path, datasets, extraction_functions, outpu
         all_evaluation_results_avg = []
         total_abstracts = 0
         abstracts, keywords = read_files_from_directory(base_path, dataset)
-        abstracts, keywords = abstracts[:10], keywords[:10]
+
         #for identifier, abstract in abstracts.items():
         for abstract, ground_truth_keywords in zip(abstracts, keywords):
             
@@ -291,7 +291,7 @@ extraction_functions = {
 
 # %%
 base_path = 'data_cs'
-datasets = ['Inspec', ]#'SemEval2010', 'www']
+datasets = ['Inspec', 'SemEval2010', 'www']
 
 output_folder = 'output'
 evaluate_keywords_from_data(base_path, datasets, extraction_functions, output_folder)

@@ -3,6 +3,8 @@ data_cs/SemEval2010/*
 data_cs/Inspec/*
 data_cs/www/*
 
+# logs
+*.log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
