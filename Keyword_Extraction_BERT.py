@@ -48,16 +48,11 @@ def extract_keywords_from_abstract(abstract):
     abstract = ' '.join([word for word in abstract.split() if word.lower() not in stop_words])
     
     # Extract keywords using KeyBERT
-    keybert_model = KeyBERT()#KeyBERT(model="m3rg-iitd/matscibert")#KeyBERT()
+    keybert_model = KeyBERT()
     keybert_keywords = [keyword[0] for keyword in keybert_model.extract_keywords(abstract, keyphrase_ngram_range=(1, 3), stop_words='english')] #keyphrase_ngram_range=(1, 3),
     
-    # Extract keywords using KeyBERT+MatSciBERT
-    keybert_m_model = KeyBERT(model="m3rg-iitd/matscibert")#KeyBERT()
-    keybert_m_keywords = [keyword[0] for keyword in keybert_m_model.extract_keywords(abstract, keyphrase_ngram_range=(1, 3), stop_words='english')] #keyphrase_ngram_range=(1, 3),
-
     return {
         "Keybert_keywords": keybert_keywords,
-        "Keybert_m_keywords": keybert_m_keywords,
     }
 
 
@@ -163,20 +158,20 @@ def extract_semeval_abstract(content):
 
 # %%
 def evaluate_keywords_from_data(base_path, datasets, extraction_functions, output_folder):
-    cumulative_precision = {method: 0 for method in extraction_functions}
-    cumulative_recall = {method: 0 for method in extraction_functions}
-    cumulative_f1_score = {method: 0 for method in extraction_functions}
 
-    all_evaluation_results = []
-    all_evaluation_results_avg = []
-    total_abstracts = 0
     for dataset in datasets:
+        cumulative_precision = {method: 0 for method in extraction_functions}
+        cumulative_recall = {method: 0 for method in extraction_functions}
+        cumulative_f1_score = {method: 0 for method in extraction_functions}
+
+        all_evaluation_results = []
+        all_evaluation_results_avg = []
+        total_abstracts = 0
         abstracts, keywords = read_files_from_directory(base_path, dataset)
         
-
         #for identifier, abstract in abstracts.items():
         for abstract, ground_truth_keywords in zip(abstracts, keywords):
-
+            
             total_abstracts += 1
 
             for method, extraction_function in extraction_functions.items():
@@ -189,34 +184,33 @@ def evaluate_keywords_from_data(base_path, datasets, extraction_functions, outpu
 
                 all_evaluation_results.append((ground_truth_keywords, extracted_keywords, method, precision, recall, f1_score, len(ground_truth_keywords), len(extracted_keywords)))
     
-    average_precision = {method: cumulative_precision[method] / total_abstracts for method in extraction_functions}
-    average_recall = {method: cumulative_recall[method] / total_abstracts for method in extraction_functions}
-    average_f1_score = {method: cumulative_f1_score[method] / total_abstracts for method in extraction_functions}
+        average_precision = {method: cumulative_precision[method] / total_abstracts for method in extraction_functions}
+        average_recall = {method: cumulative_recall[method] / total_abstracts for method in extraction_functions}
+        average_f1_score = {method: cumulative_f1_score[method] / total_abstracts for method in extraction_functions}
 
-    # Print average scores
-    print("Average Scores over all Abstracts:")
-    for method in extraction_functions:
-        print(f"Method      , Average Precision:                    , Average Recall:                    , Average F1-score:                    ")
-        print(f"{method},{average_precision[method]},{average_recall[method]},{average_f1_score[method]}")
-        all_evaluation_results_avg.append((method, average_precision[method], average_recall[method], average_f1_score[method]))
+        # Print average scores
+        print("Average Scores over all Abstracts:")
+        for method in extraction_functions:
+            print(f"Method      , Average Precision:                    , Average Recall:                    , Average F1-score:                    ")
+            print(f"{method},{average_precision[method]},{average_recall[method]},{average_f1_score[method]}")
+            all_evaluation_results_avg.append((method, average_precision[method], average_recall[method], average_f1_score[method]))
 
-    # Write ground truth keywords, extracted keywords, and evaluation results to CSV files
-    with open(os.path.join(output_folder, 'evaluation_results_bert.csv'), 'w', newline='', encoding='utf-8') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['Ground_truth Keywords', 'Extracted Keywords', 'Method', 'Precision', 'Recall', 'F1-score', 'n_gt_keywords', 'n_extraced_leywords'])
-        writer.writerows(all_evaluation_results)
-    
-    with open(os.path.join(output_folder, 'evaluation_results_avg_bert.csv'), 'w', newline='', encoding='utf-8') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['Method', 'Precision', 'Recall', 'F1-score'])
-        writer.writerows(all_evaluation_results_avg)
+        # Write ground truth keywords, extracted keywords, and evaluation results to CSV files
+        with open(os.path.join(output_folder, f'evaluation_results_bert_{dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['Ground_truth Keywords', 'Extracted Keywords', 'Method', 'Precision', 'Recall', 'F1-score', 'n_gt_keywords', 'n_extraced_leywords'])
+            writer.writerows(all_evaluation_results)
+        
+        with open(os.path.join(output_folder, f'evaluation_results_avg_bert_{dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['Method', 'Precision', 'Recall', 'F1-score'])
+            writer.writerows(all_evaluation_results_avg)
 
 
 # %%
 # Define extraction functions
 extraction_functions = {
     "Keybert_keywords": lambda abstract: extract_keywords_from_abstract(abstract)["Keybert_keywords"],
-    "Keybert_m_keywords": lambda abstract: extract_keywords_from_abstract(abstract)["Keybert_m_keywords"],
 }
 
 # %%

@@ -189,20 +189,20 @@ def extract_semeval_abstract(content):
 
 # %%
 def evaluate_keywords_from_data(base_path, datasets, extraction_functions, output_folder):
-    cumulative_precision = {method: 0 for method in extraction_functions}
-    cumulative_recall = {method: 0 for method in extraction_functions}
-    cumulative_f1_score = {method: 0 for method in extraction_functions}
 
-    all_evaluation_results = []
-    all_evaluation_results_avg = []
-    total_abstracts = 0
     for dataset in datasets:
+        cumulative_precision = {method: 0 for method in extraction_functions}
+        cumulative_recall = {method: 0 for method in extraction_functions}
+        cumulative_f1_score = {method: 0 for method in extraction_functions}
+
+        all_evaluation_results = []
+        all_evaluation_results_avg = []
+        total_abstracts = 0
         abstracts, keywords = read_files_from_directory(base_path, dataset)
         
-
         #for identifier, abstract in abstracts.items():
         for abstract, ground_truth_keywords in zip(abstracts, keywords):
-
+            
             total_abstracts += 1
 
             for method, extraction_function in extraction_functions.items():

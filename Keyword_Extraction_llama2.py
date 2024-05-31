@@ -82,19 +82,18 @@ generator_llama2 = pipeline(
 # System prompt describes information given to all conversations
 system_prompt = """
 <s>[INST] <<SYS>>
-You are a helpful, respectful and honest assistant for extracting concepts related to computer science.
+You are a helpful, respectful and honest assistant for extracting concepts related to computer science from provided documents.
 <</SYS>>
 """
 
 example_prompt = """
 I have a topic that contains the following documents:
-- The synthesis of carbon nanotubes presents scalable production challenges but offers significant advantages in electrical conductivity and tensile strength for composite materials. 
+- The development of machine learning algorithms for data analysis involves complex computational techniques and models such as neural networks, decision trees, and ensemble methods, which are used to enhance pattern recognition and predictive analytics.
 
-Give me the concepts that are present in this document and related to computer science and separate them with commas.
+Give me all the concepts that are present in this document and related to computer science and separate them with commas.
 Make sure you only return the concepts and say nothing else. For example, don't say:
 "Sure, I'd be happy to help! Based on the information provided in the document".
-
-[/INST] carbon nanotubes,electrical conductivity,tensile strength,composite materials,
+[/INST] machine learning algorithms,data analysis,complex computational techniques,neural networks, decision trees,ensemble methods,pattern recognition,predictive analytics,
 """
 
 main_prompt = """
@@ -102,15 +101,15 @@ main_prompt = """
 I have the following document:
 [DOCUMENT]
 
-Give me the concepts that are present in this document and related to computer science and separate them with commas.
+Give me all the concepts that are present in this document and related to computer science and separate them with commas.
 Make sure you only return the concepts and say nothing else. For example, don't say:
 "Sure, I'd be happy to help! Based on the information provided in the document".
-
 [/INST]
 """
 
 prompt_zero_shot = system_prompt +  main_prompt
 prompt_one_shot = system_prompt + example_prompt + main_prompt
+
 
 # %%
 def extract_keywords_from_abstract(abstract):
@@ -128,7 +127,7 @@ def extract_keywords_from_abstract(abstract):
     kw_model_llama2 = KeyBERT(llm=llm_llama2, model='BAAI/bge-small-en-v1.5')
     raw_keywords = kw_model_llama2.extract_keywords([abstract], threshold=0.5)[0]
     cleaned_keywords_one_shot = [keyword.rstrip('.') for keyword in raw_keywords if keyword.rstrip('.').lower() in abstract.lower()]
-
+   
     return {
         "llama2_KeyBERT_zero_shot": cleaned_keywords_zero_shot,
         "llama2_KeyBERT_one_shot": cleaned_keywords_one_shot,
@@ -236,20 +235,20 @@ def extract_semeval_abstract(content):
 
 # %%
 def evaluate_keywords_from_data(base_path, datasets, extraction_functions, output_folder):
-    cumulative_precision = {method: 0 for method in extraction_functions}
-    cumulative_recall = {method: 0 for method in extraction_functions}
-    cumulative_f1_score = {method: 0 for method in extraction_functions}
 
-    all_evaluation_results = []
-    all_evaluation_results_avg = []
-    total_abstracts = 0
     for dataset in datasets:
-        abstracts, keywords = read_files_from_directory(base_path, dataset)
-        
+        cumulative_precision = {method: 0 for method in extraction_functions}
+        cumulative_recall = {method: 0 for method in extraction_functions}
+        cumulative_f1_score = {method: 0 for method in extraction_functions}
 
+        all_evaluation_results = []
+        all_evaluation_results_avg = []
+        total_abstracts = 0
+        abstracts, keywords = read_files_from_directory(base_path, dataset)
+        abstracts, keywords = abstracts[:10], keywords[:10]
         #for identifier, abstract in abstracts.items():
         for abstract, ground_truth_keywords in zip(abstracts, keywords):
-
+            
             total_abstracts += 1
 
             for method, extraction_function in extraction_functions.items():
@@ -262,27 +261,27 @@ def evaluate_keywords_from_data(base_path, datasets, extraction_functions, outpu
 
                 all_evaluation_results.append((ground_truth_keywords, extracted_keywords, method, precision, recall, f1_score, len(ground_truth_keywords), len(extracted_keywords)))
     
-    average_precision = {method: cumulative_precision[method] / total_abstracts for method in extraction_functions}
-    average_recall = {method: cumulative_recall[method] / total_abstracts for method in extraction_functions}
-    average_f1_score = {method: cumulative_f1_score[method] / total_abstracts for method in extraction_functions}
+        average_precision = {method: cumulative_precision[method] / total_abstracts for method in extraction_functions}
+        average_recall = {method: cumulative_recall[method] / total_abstracts for method in extraction_functions}
+        average_f1_score = {method: cumulative_f1_score[method] / total_abstracts for method in extraction_functions}
 
-    # Print average scores
-    print("Average Scores over all Abstracts:")
-    for method in extraction_functions:
-        print(f"Method      , Average Precision:                    , Average Recall:                    , Average F1-score:                    ")
-        print(f"{method},{average_precision[method]},{average_recall[method]},{average_f1_score[method]}")
-        all_evaluation_results_avg.append((method, average_precision[method], average_recall[method], average_f1_score[method]))
+        # Print average scores
+        print("Average Scores over all Abstracts:")
+        for method in extraction_functions:
+            print(f"Method      , Average Precision:                    , Average Recall:                    , Average F1-score:                    ")
+            print(f"{method},{average_precision[method]},{average_recall[method]},{average_f1_score[method]}")
+            all_evaluation_results_avg.append((method, average_precision[method], average_recall[method], average_f1_score[method]))
 
-    # Write ground truth keywords, extracted keywords, and evaluation results to CSV files
-    with open(os.path.join(output_folder, 'evaluation_results_llama2.csv'), 'w', newline='', encoding='utf-8') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['Ground_truth Keywords', 'Extracted Keywords', 'Method', 'Precision', 'Recall', 'F1-score', 'n_gt_keywords', 'n_extraced_leywords'])
-        writer.writerows(all_evaluation_results)
-    
-    with open(os.path.join(output_folder, 'evaluation_results_avg_llama2.csv'), 'w', newline='', encoding='utf-8') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['Method', 'Precision', 'Recall', 'F1-score'])
-        writer.writerows(all_evaluation_results_avg)
+        # Write ground truth keywords, extracted keywords, and evaluation results to CSV files
+        with open(os.path.join(output_folder, f'evaluation_results_llama2_{dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['Ground_truth Keywords', 'Extracted Keywords', 'Method', 'Precision', 'Recall', 'F1-score', 'n_gt_keywords', 'n_extraced_leywords'])
+            writer.writerows(all_evaluation_results)
+        
+        with open(os.path.join(output_folder, f'evaluation_results_avg_llama2_{dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['Method', 'Precision', 'Recall', 'F1-score'])
+            writer.writerows(all_evaluation_results_avg)
 
 # Define extraction functions
 extraction_functions = {
@@ -292,7 +291,7 @@ extraction_functions = {
 
 # %%
 base_path = 'data_cs'
-datasets = ['Inspec', 'SemEval2010', 'www']
+datasets = ['Inspec', ]#'SemEval2010', 'www']
 
 output_folder = 'output'
 evaluate_keywords_from_data(base_path, datasets, extraction_functions, output_folder)

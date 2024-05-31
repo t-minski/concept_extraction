@@ -1,0 +1,21 @@
+Ground_truth Keywords,Extracted Keywords,Method,Precision,Recall,F1-score,n_gt_keywords,n_extraced_leywords
+[],"['Class', 'Defects', 'Behavioral Defects', 'Modes', 'Operation', 'Implementation', 'Solution', 'Problem', 'Closed Heat Consumption System']",llama2_KeyBERT_zero_shot,0.0,0.0,0.0,0,9
+[],"['diagnosis', 'heat systems', 'step-by-step approach', 'technical state', 'physical defects', 'behavioral defects', 'objects', 'closed heat consumption system']",llama2_KeyBERT_one_shot,0.0,0.0,0.0,0,8
+[],[],llama2_KeyBERT_zero_shot,0.0,0.0,0.0,0,0
+[],"['3g networks', 'rolling out', 'Europe', 'delays', 'negative slant']",llama2_KeyBERT_one_shot,0.0,0.0,0.0,0,5
+[],[],llama2_KeyBERT_zero_shot,0.0,0.0,0.0,0,0
+[],"['approach', 'new', 'd-mc problem', 'real-world systems', 'multi-state systems', 'flow networks', 'algorithm', 'data structures', 'reliability', 'example']",llama2_KeyBERT_one_shot,0.0,0.0,0.0,0,10
+[],"['spanning trees', 'flow', 'computer network', 'circuit analysis', 'minimal paths (mps)', 'structured approach', 'structural mps']",llama2_KeyBERT_zero_shot,0.0,0.0,0.0,0,7
+[],"['algorithm', 'spanning tree', 'flow', 'undirected graphs', 'computer network', 'circuit analysis', 'minimal paths (mps)', 'structured approach', 'easy to follow']",llama2_KeyBERT_one_shot,0.0,0.0,0.0,0,9
+[],[],llama2_KeyBERT_zero_shot,0.0,0.0,0.0,0,0
+[],"['integration', 'software manufacturers', 'biotechnology', 'innovation', 'linking initiatives']",llama2_KeyBERT_one_shot,0.0,0.0,0.0,0,5
+[],"['Score tests', 'zero-inflated Poisson models', 'count data', 'zero-inflation', 'Poisson regression', 'constant proportion of excess zeros', 'covariates', 'simulation study', 'composite test', 'zero probability']",llama2_KeyBERT_zero_shot,0.0,0.0,0.0,0,10
+[],"['score tests', 'zero-inflated poisson models', 'count data', 'zero probability', 'covariates', 'simulation study', 'composite test']",llama2_KeyBERT_one_shot,0.0,0.0,0.0,0,7
+[],[],llama2_KeyBERT_zero_shot,0.0,0.0,0.0,0,0
+[],"['sensors', 'collision detection', 'computational techniques', 'convex objects', 'non-convex objects', 'interframe collision detection', 'tracking technologies']",llama2_KeyBERT_one_shot,0.0,0.0,0.0,0,7
+[],[],llama2_KeyBERT_zero_shot,0.0,0.0,0.0,0,0
+[],"['debugging', 'web applications', 'tools', '']",llama2_KeyBERT_one_shot,0.0,0.0,0.0,0,4
+[],[],llama2_KeyBERT_zero_shot,0.0,0.0,0.0,0,0
+[],"['fuzzy-logic controller', 'asynchronous motor', 'pwm voltage-source inverters', 'stator field-oriented control', 'simulation study']",llama2_KeyBERT_one_shot,0.0,0.0,0.0,0,5
+[],[],llama2_KeyBERT_zero_shot,0.0,0.0,0.0,0,0
+[],"['hours of operation', 'service in academic libraries', 'standard', 'survey', 'reference hours', 'access']",llama2_KeyBERT_one_shot,0.0,0.0,0.0,0,6
