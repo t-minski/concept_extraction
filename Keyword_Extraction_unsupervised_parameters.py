@@ -1,21 +1,30 @@
 # %%
 import csv
 import os
+import bibtexparser
 from yake import KeywordExtractor
 from rake_nltk import Rake
+from sklearn.metrics import precision_recall_fscore_support
 from yake import KeywordExtractor
 from rake_nltk import Rake
+from gensim.models.phrases import Phrases, ENGLISH_CONNECTOR_WORDS
 from pyate import combo_basic, basic, cvalues
 from summa import keywords as summa_keywords
 import spacy
+import pandas as pd
+from keybert import KeyBERT
 from nltk.stem import PorterStemmer
+import Levenshtein
+from Levenshtein import distance
+from nltk.corpus import wordnet
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from fuzzywuzzy import fuzz
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
 from gensim.models import LdaModel
 from gensim.corpora import Dictionary
 from nltk.corpus import stopwords
-import Levenshtein
 # %%
 import nltk
 nltk.download('stopwords')
@@ -201,51 +210,14 @@ def extract_krapivin_abstract(content):
 def evaluate_keywords_from_data(base_path, datasets, extraction_functions, output_folder):
 
     for dataset in datasets:
-        cumulative_precision = {method: 0 for method in extraction_functions}
-        cumulative_recall = {method: 0 for method in extraction_functions}
-        cumulative_f1_score = {method: 0 for method in extraction_functions}
+        abstracts, keywords = read_files_from_directory(base_path, dataset)       
+        for method in ['TFIDF', 'YAKE', 'LSA', 'LDA']:
+            study = optuna.create_study(direction='maximize')
+            study.optimize(lambda trial: objective(trial, method, abstracts, keywords, len(abstracts)), n_trials= 100)
 
-        all_evaluation_results = []
-        all_evaluation_results_avg = []
-        total_abstracts = 0
-        abstracts, keywords = read_files_from_directory(base_path, dataset)
-        
-        #for identifier, abstract in abstracts.items():
-        for abstract, ground_truth_keywords in zip(abstracts, keywords):
-            
-            total_abstracts += 1
-
-            for method, extraction_function in extraction_functions.items():
-                extracted_keywords = extraction_function(abstract.lower())
-                precision, recall, f1_score = evaluate_keywords(ground_truth_keywords, extracted_keywords)
-
-                cumulative_precision[method] += precision
-                cumulative_recall[method] += recall
-                cumulative_f1_score[method] += f1_score
-
-                all_evaluation_results.append((ground_truth_keywords, extracted_keywords, method, precision, recall, f1_score, len(ground_truth_keywords), len(extracted_keywords)))
-    
-        average_precision = {method: cumulative_precision[method] / total_abstracts for method in extraction_functions}
-        average_recall = {method: cumulative_recall[method] / total_abstracts for method in extraction_functions}
-        average_f1_score = {method: cumulative_f1_score[method] / total_abstracts for method in extraction_functions}
-
-        # Print average scores
-        print("Average Scores over all Abstracts:")
-        for method in extraction_functions:
-            print(f"Method      , Average Precision:                    , Average Recall:                    , Average F1-score:                    ")
-            print(f"{method},{average_precision[method]},{average_recall[method]},{average_f1_score[method]}")
-            all_evaluation_results_avg.append((method, average_precision[method], average_recall[method], average_f1_score[method]))
-
-        # Write ground truth keywords, extracted keywords, and evaluation results to CSV files
-        with open(os.path.join(output_folder, f'evaluation_results_unsupervised_{dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(['Ground_truth Keywords', 'Extracted Keywords', 'Method', 'Precision', 'Recall', 'F1-score', 'n_gt_keywords', 'n_extraced_leywords'])
-            writer.writerows(all_evaluation_results)
-        
-        with open(os.path.join(output_folder, f'evaluation_results_avg_unsupervised_{dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(['Method', 'Precision', 'Recall', 'F1-score'])
-            writer.writerows(all_evaluation_results_avg)
+            # Output the best parameters found
+            print('method and dataset are: ', method, dataset)
+            print("Best parameters are:", study.best_params)
 
 
 # %%
@@ -263,6 +235,84 @@ extraction_functions = {
     "LSA_keywords": lambda abstract: extract_keywords_from_abstract(abstract)["LSA_keywords"],
     "LDA_keywords": lambda abstract: extract_keywords_from_abstract(abstract)["LDA_keywords"],
 }
+
+# %%
+import optuna
+import logging
+
+# Setup logging to only show warning messages or higher (suppressing info messages)
+logging.getLogger('optuna').setLevel(logging.WARNING)
+
+# Define the optimization objective function for a given method and abstract
+def objective(trial, method, abstracts, ground_truth_keywords_list, num_abstracts):
+    
+    total_score = 0
+    for abstract, ground_truth_keywords in zip(abstracts, ground_truth_keywords_list):
+        if method == "YAKE":
+            max_ngram_size  = trial.suggest_int("n", 1, 3)
+            dedupLim = trial.suggest_float("dedupLim", 0.1, 1.0)
+            dedupFunc = trial.suggest_categorical("dedupFunc", ["seqm", "jaro", "levenshtein"])
+            windowsSize = trial.suggest_int("windowsSize", 1, 3)
+            top = trial.suggest_int("top", 10, 50)
+            kw_extractor = KeywordExtractor(lan="en", n=max_ngram_size,
+                                            dedupLim=dedupLim, dedupFunc=dedupFunc,
+                                            windowsSize=windowsSize, top=top)
+            keywords = [kw[0] for kw in kw_extractor.extract_keywords(abstract)]
+
+        elif method == "TFIDF":
+            ngram_range = trial.suggest_categorical("ngram_range", [(1, 1), (1, 2), (1, 3)])
+            use_idf = trial.suggest_categorical("use_idf", [True, False])
+            min_df = trial.suggest_float("min_df", 0, 1.)  # min document frequency (absolute counts)
+            #max_df = trial.suggest_float("max_df", (min_df + 1) / num_abstracts, 1.0)  # max document frequency as a proportion
+            #max_features = trial.suggest_categorical("max_features", [None, 500, 1000, 5000])  # number of max features
+            norm = trial.suggest_categorical("norm", ['l1', 'l2', None])  # normalization
+            sublinear_tf = trial.suggest_categorical("sublinear_tf", [True, False])  # sublinear term frequency scaling
+
+            # Initialize TF-IDF Vectorizer with the suggested parameters
+            tfidf_vectorizer = TfidfVectorizer(
+                                            stop_words='english',
+                                            ngram_range=ngram_range,
+                                            #max_df=max_df,
+                                            min_df=min_df,
+                                            #max_features=max_features,
+                                            norm=norm,
+                                            use_idf=use_idf,
+                                            sublinear_tf=sublinear_tf)
+            tfidf_matrix = tfidf_vectorizer.fit_transform([abstract])
+            keywords = tfidf_vectorizer.get_feature_names_out()
+        
+        elif method == "LSA":
+            n_components = trial.suggest_int("n_components", 5, 50)
+            ngram_range = trial.suggest_categorical("ngram_range", [(1, 1), (1, 2), (1, 3)])
+            top_words = trial.suggest_int("top_words", 1, 20)
+            lsa_model = TruncatedSVD(n_components=n_components)
+            tfidf_vectorizer = TfidfVectorizer(stop_words='english', ngram_range=(1, 2),
+                                            use_idf= True, min_df= 0.5875806866591319,
+                                            norm= None, sublinear_tf= False)
+            tfidf_matrix = tfidf_vectorizer.fit_transform([abstract])
+            tfidf_keywords = tfidf_vectorizer.get_feature_names_out()
+            lsa_model.fit_transform(tfidf_matrix)
+            terms = [tfidf_keywords[i] for i in lsa_model.components_[0].argsort()[::-1]]
+            # Accessing the terms and their respective weights
+            component_terms = lsa_model.components_[0].argsort()[-top_words:][::-1]
+            keywords = [terms[i] for i in component_terms]
+        
+        elif method == "LDA":
+            dictionary = Dictionary([abstract.split()])
+            corpus = [dictionary.doc2bow(abstract.split())]
+            doc_term_matrix = [dictionary.doc2bow(doc) for doc in [abstract.split()]]
+            
+            num_topics = trial.suggest_int("num_topics", 2, 20)
+            lda_model = LdaModel(corpus=doc_term_matrix, num_topics=num_topics, id2word=dictionary)
+            keywords = [word for word, _ in lda_model.show_topic(0)]
+    
+        precision, recall, f1_score = evaluate_keywords(ground_truth_keywords, keywords)
+    
+        total_score += f1_score
+
+    # Average score over all abstracts
+    average_score = total_score / len(abstracts)
+    return average_score
 
 # %%
 base_path = 'data_cs'
