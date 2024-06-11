@@ -1,5 +1,6 @@
 import spacy
-from base_model import BaseModel
+from models.base_model import BaseModel
+from typing import List, Tuple
 
 class SpacyEntities(BaseModel):
     
@@ -10,12 +11,12 @@ class SpacyEntities(BaseModel):
     def fit(self, abstracts: List[str], concepts: List[List[str]]) -> None:
         pass
 
-    def predict(self, abstracts: List[str]) -> List[List[str]]:        
+    def predict(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
         # Extract keywords using Spacy entities
         entities = []
         for abstract in abstracts:
             doc = self.nlp(abstract)
-            entities.append([ent.text for ent in doc.ents])
+            entities.append([(ent.text, 1.0) for ent in doc.ents])
         
         return entities
 
@@ -29,10 +30,10 @@ class SpacyNounChunks(BaseModel):
     def fit(self, abstracts: List[str], concepts: List[List[str]]) -> None:
         pass
 
-    def predict(self, abstracts: List[str]) -> List[List[str]]:        
+    def predict(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
         # Extract keywords using Spacy entities
         entities = []
         for abstract in abstracts:
             doc = self.nlp(abstract)
-            entities.append([chunk.text for chunk in doc.noun_chunks])
+            entities.append([(chunk.text, 1.0) for chunk in doc.noun_chunks])
         return entities
