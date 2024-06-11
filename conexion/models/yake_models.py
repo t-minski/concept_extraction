@@ -1,7 +1,7 @@
 from yake import KeywordExtractor
 from base_model import BaseModel
 
-class SpacyEntities(BaseModel):
+class YakeEntities(BaseModel):
     
     def __init__(self):
         self.kw_extractor = KeywordExtractor(lan="en", n=2,
@@ -12,7 +12,7 @@ class SpacyEntities(BaseModel):
         pass
 
     def predict(self, abstracts: List[str]) -> List[List[str]]:        
-        # Extract keywords using Spacy entities
+        # Extract keywords using YAKE entities
         entities = []
         for abstract in abstracts:
             yake_keywords = self.kw_extractor.extract_keywords(abstract)

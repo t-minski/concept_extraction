@@ -5,6 +5,7 @@ data_cs/SemEval2017/*
 
 # logs
 *.log
+*.docbin
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
