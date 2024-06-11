@@ -1,5 +1,6 @@
 from yake import KeywordExtractor
-from base_model import BaseModel
+from models.base_model import BaseModel
+from typing import List, Tuple
 
 class YakeEntities(BaseModel):
     
@@ -16,7 +17,7 @@ class YakeEntities(BaseModel):
         entities = []
         for abstract in abstracts:
             yake_keywords = self.kw_extractor.extract_keywords(abstract)
-            yake_keywords = [keyword[0] for keyword in yake_keywords]
-            entities.append(yake_keywords)
+            keywords = [keyword[0] for keyword in yake_keywords]
+            entities.append([(ent, 1.0) for ent in keywords])
         
         return entities

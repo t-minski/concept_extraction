@@ -1,5 +1,6 @@
 from pyate import combo_basic, basic, cvalues
-from base_model import BaseModel
+from models.base_model import BaseModel
+from typing import List, Tuple
 
 class PyateBasicsEntities(BaseModel):
     
@@ -13,8 +14,8 @@ class PyateBasicsEntities(BaseModel):
         # Extract keywords using Pyate entities
         entities = []
         for abstract in abstracts:
-            pyate_basic_keywords = basic(abstract).sort_values(ascending=False).index.str.split().str[0].tolist()
-            entities.append(pyate_basic_keywords)
+            keywords = basic(abstract).sort_values(ascending=False).index.str.split().str[0].tolist()
+            entities.append([(ent, 1.0) for ent in keywords])
         
         return entities
     
@@ -30,8 +31,8 @@ class PyateComboBasicEntities(BaseModel):
         # Extract keywords using Pyate entities
         entities = []
         for abstract in abstracts:
-            pyate_combo_basic_keywords = combo_basic(abstract).sort_values(ascending=False).index.str.split().str[0].tolist()
-            entities.append(pyate_combo_basic_keywords)
+            keywords = combo_basic(abstract).sort_values(ascending=False).index.str.split().str[0].tolist()
+            entities.append([(ent, 1.0) for ent in keywords])
         
         return entities
     
@@ -47,7 +48,7 @@ class PyateCvaluesEntities(BaseModel):
         # Extract keywords using Pyate entities
         entities = []
         for abstract in abstracts:
-            pyate_cvalues_keywords = cvalues(abstract).sort_values(ascending=False).index.str.split().str[0].tolist()
-            entities.append(pyate_cvalues_keywords)
+            keywords = cvalues(abstract).sort_values(ascending=False).index.str.split().str[0].tolist()
+            entities.append([(ent, 1.0) for ent in keywords])
         
         return entities

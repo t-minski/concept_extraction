@@ -1,5 +1,6 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
-from base_model import BaseModel
+from models.base_model import BaseModel
+from typing import List, Tuple
 
 class TfIdfEntities(BaseModel):
     
@@ -22,7 +23,7 @@ class TfIdfEntities(BaseModel):
         entities = []
         for abstract in abstracts:
             tfidf_matrix = self.tfidf_vectorizer.fit_transform([abstract])
-            tfidf_keywords = self.tfidf_vectorizer.get_feature_names_out()
-            entities.append(tfidf_keywords)
+            keywords = self.tfidf_vectorizer.get_feature_names_out()
+            entities.append([(ent, 1.0) for ent in keywords])
         
         return entities

@@ -1,5 +1,6 @@
 from rake_nltk import Rake
-from base_model import BaseModel
+from models.base_model import BaseModel
+from typing import List, Tuple
 
 class RakeEntities(BaseModel):
     
@@ -14,7 +15,7 @@ class RakeEntities(BaseModel):
         entities = []
         for abstract in abstracts:
             self.rake_nltk_var.extract_keywords_from_text(abstract)
-            rake_keywords = self.rake_nltk_var.get_ranked_phrases()
-            entities.append(rake_keywords)
+            keywords = self.rake_nltk_var.get_ranked_phrases()
+            entities.append([(ent, 1.0) for ent in keywords])
         
         return entities

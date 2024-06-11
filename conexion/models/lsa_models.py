@@ -1,6 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
-from base_model import BaseModel
+from models.base_model import BaseModel
+from typing import List, Tuple
 
 class LSAEntities(BaseModel):
     
@@ -26,7 +27,7 @@ class LSAEntities(BaseModel):
             tfidf_matrix = self.tfidf_vectorizer.fit_transform([abstract])
             tfidf_keywords = self.tfidf_vectorizer.get_feature_names_out()
             lsa_matrix = self.lsa_model.fit_transform(tfidf_matrix)
-            lsa_keywords = [tfidf_keywords[i] for i in self.lsa_model.components_[0].argsort()[::-1]]
-            entities.append(lsa_keywords)
+            keywords = [tfidf_keywords[i] for i in self.lsa_model.components_[0].argsort()[::-1]]
+            entities.append([(ent, 1.0) for ent in keywords])
         
         return entities

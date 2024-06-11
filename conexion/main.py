@@ -36,7 +36,8 @@ def setup_parser() -> argparse.ArgumentParser:
 
 models_map = {
     "SpacyEntities": ("models.spacy_models", "SpacyEntities"),
-    "SpacyNounChunks": ("models.spacy_models", "SpacyNounChunks")
+    "SpacyNounChunks": ("models.spacy_models", "SpacyNounChunks"),
+    "KeyBERTEntities": ("models.llm_models", "KeyBERTEntities")
 }
 
 def get_models(model_texts: List[str]) -> List:
@@ -79,7 +80,7 @@ def cli_evaluate() -> None:
     #parser = setup_parser()
     #args = parse_eval_args(parser)
 
-    models = get_models(['SpacyEntities']) #args.models)
+    models = get_models(['KeyBERTEntities']) #args.models)
     datasets = get_datasets(['inspec']) #args.datasets)
 
     evaluate(models, datasets, 'output')#args.output)
