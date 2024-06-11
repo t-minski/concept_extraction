@@ -1,6 +1,9 @@
+import os
+import csv
+
 def evaluate_p_r_f(keyphrases, references):
-    P = len(set(keyphrases) & set(references)) / len(keyphrases)
-    R = len(set(keyphrases) & set(references)) / len(references)
+    P = len(set(keyphrases) & set(references)) / len(keyphrases) if len(keyphrases) > 0 else 0
+    R = len(set(keyphrases) & set(references)) / len(references) if len(references) > 0 else 0
     F = (2*P*R)/(P+R) if (P+R) > 0 else 0 
     return (P, R, F)
 
@@ -8,10 +11,11 @@ def evaluate_p_r_f(keyphrases, references):
 def evaluate(models, datasets, output_folder):
     # Evaluate the models on the datasets
     for dataset in datasets:
+        type_dataset = dataset.__class__.__name__
         training_abstracts, training_concepts = dataset.get_training_data()
         test_abstracts, test_concepts = dataset.get_test_data()
         for model in models:
-            type_model = type(model)
+            type_model = model.__class__.__name__
             # Train the model
             model.fit(training_abstracts, training_concepts)
             
@@ -39,14 +43,12 @@ def evaluate(models, datasets, output_folder):
             average_f1_score =  cumulative_f1_score / len(test_abstracts)
 
             # Write ground truth keywords, extracted keywords, and evaluation results to CSV files
-            with open(os.path.join(output_folder, f'evaluation_results_{type_model}_{dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
+            with open(os.path.join(output_folder, f'evaluation_results_{type_model}_{type_dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(['Ground_truth Keywords', 'Extracted Keywords', 'Precision', 'Recall', 'F1-score', 'n_gt_keywords', 'n_extraced_leywords'])
                 writer.writerows(all_evaluation_results)
             
-            with open(os.path.join(output_folder, f'evaluation_results_avg_{type_model}_{dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
+            with open(os.path.join(output_folder, f'evaluation_results_avg_{type_model}_{type_dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(['Precision', 'Recall', 'F1-score'])
-                writer.writerows((average_precision, average_recall, average_f1_score))
-
-                
+                writer.writerow([str(average_precision), str(average_recall), str(average_f1_score)])

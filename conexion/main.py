@@ -1,9 +1,16 @@
 import argparse
 import logging
-from data.load_data import download_data
 from evaluation.evaluator import evaluate
 import importlib
 from typing import List
+import os
+
+def dir_path(string):
+    if os.path.isdir(string):
+        return string
+    else:
+        raise NotADirectoryError(string)
+
 
 def setup_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
@@ -13,6 +20,10 @@ def setup_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--datasets", "-d", nargs='+', help="Name of datasets e.g. `inspec`"
+    )
+
+    parser.add_argument(
+        "--output", "-o", type=dir_path, help="Folder of the output files", default="output"
     )
 
     parser.add_argument("-v", "--verbose", help="increase output verbosity",
@@ -65,13 +76,13 @@ def parse_eval_args(parser: argparse.ArgumentParser) -> argparse.Namespace:
     return args
 
 def cli_evaluate() -> None:
-    parser = setup_parser()
-    args = parse_eval_args(parser)
+    #parser = setup_parser()
+    #args = parse_eval_args(parser)
 
-    models = get_models(args.models)
-    datasets = get_datasets(args.datasets)
+    models = get_models(['SpacyEntities']) #args.models)
+    datasets = get_datasets(['inspec']) #args.datasets)
 
-    evaluate(models, datasets)
+    evaluate(models, datasets, 'output')#args.output)
 
 if __name__ == "__main__":
     cli_evaluate()
