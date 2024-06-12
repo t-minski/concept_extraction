@@ -1,6 +1,6 @@
 from data.base_dataset import BaseDataset
 from typing import List, Tuple
-from statistics_logger import log_statistics
+from data.statistics_logger import log_statistics
 from datasets import load_dataset
 
 class kp20k(BaseDataset):                
