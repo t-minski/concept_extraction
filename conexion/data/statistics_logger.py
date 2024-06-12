@@ -1,8 +1,12 @@
 import logging
 import statistics
-
+import spacy
 # Set up the logger
 logger = logging.getLogger(__name__)
+
+# Load models
+nlp_sci = spacy.load("en_core_sci_lg")
+nlp_web = spacy.load("en_core_web_lg")
 
 def log_statistics(documents, extractive_keyphrases):
     filtered_documents = []
@@ -18,11 +22,26 @@ def log_statistics(documents, extractive_keyphrases):
     total_filtered_keyphrases = 0
     total_unfiltered_keyphrases = 0
 
+    total_named_entity_keyphrases = 0
+    total_noun_phrase_keyphrases = 0
+
     for tokens, keyphrases in zip(documents, extractive_keyphrases):
         document_text = ' '.join(tokens)
         filtered_phrases = [phrase for phrase in keyphrases if phrase in document_text]
         unfiltered_phrases = [phrase for phrase in keyphrases if phrase not in document_text]
         
+        # Named entity recognition
+        doc_sci = nlp_sci(document_text)
+        named_entities = {ent.text for ent in doc_sci.ents}
+        named_entity_keyphrases = [phrase for phrase in filtered_phrases if phrase in named_entities]
+        total_named_entity_keyphrases += len(named_entity_keyphrases)
+        
+        # Noun phrase detection
+        doc_web = nlp_web(document_text)
+        noun_phrases = {chunk.text for chunk in doc_web.noun_chunks if not chunk.root.dep_ == 'det'}
+        noun_phrase_keyphrases = [phrase for phrase in filtered_phrases if phrase in noun_phrases]
+        total_noun_phrase_keyphrases += len(noun_phrase_keyphrases)
+
         filtered_documents.append(document_text)
         filtered_keyphrases.append(filtered_phrases)
         unfiltered_keyphrases.extend(unfiltered_phrases)
@@ -52,6 +71,10 @@ def log_statistics(documents, extractive_keyphrases):
     min_unfiltered_keyphrases = min(unfiltered_keyphrases_per_document)
     stddev_unfiltered_keyphrases = statistics.stdev(unfiltered_keyphrases_per_document)
 
+    # Calculate percentages
+    percentage_named_entity_keyphrases = (total_named_entity_keyphrases / total_filtered_keyphrases) * 100 if total_filtered_keyphrases else 0
+    percentage_noun_phrase_keyphrases = (total_noun_phrase_keyphrases / total_filtered_keyphrases) * 100 if total_filtered_keyphrases else 0
+
     # Log statistics
     logger.info(f"Total documents: {total_documents}")
     logger.info(f"Total keyphrases: {total_keyphrases}")
@@ -72,5 +95,8 @@ def log_statistics(documents, extractive_keyphrases):
     logger.info(f"Max unfiltered keyphrases in a document: {max_unfiltered_keyphrases}")
     logger.info(f"Min unfiltered keyphrases in a document: {min_unfiltered_keyphrases}")
     logger.info(f"Standard deviation of unfiltered keyphrases per document: {stddev_unfiltered_keyphrases}")
+
+    logger.info(f"Percentage of keyphrases that are named entities: {percentage_named_entity_keyphrases:.2f}%")
+    logger.info(f"Percentage of keyphrases that are noun phrases: {percentage_noun_phrase_keyphrases:.2f}%")
 
     return filtered_documents, filtered_keyphrases

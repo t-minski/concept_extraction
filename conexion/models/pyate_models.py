@@ -14,8 +14,9 @@ class PyateBasicsEntities(BaseModel):
         # Extract keywords using Pyate entities
         entities = []
         for abstract in abstracts:
-            keywords = basic(abstract).sort_values(ascending=False).index.str.split().str[0].tolist()
-            entities.append([(ent, 1.0) for ent in keywords])
+            pyate_keywords = basic(abstract)
+            keywords_with_scores = [(keyword, score) for keyword, score in pyate_keywords.items()]
+            entities.append(keywords_with_scores)
         
         return entities
     
@@ -31,8 +32,9 @@ class PyateComboBasicEntities(BaseModel):
         # Extract keywords using Pyate entities
         entities = []
         for abstract in abstracts:
-            keywords = combo_basic(abstract).sort_values(ascending=False).index.str.split().str[0].tolist()
-            entities.append([(ent, 1.0) for ent in keywords])
+            pyate_keywords = combo_basic(abstract)
+            keywords_with_scores = [(keyword, score) for keyword, score in pyate_keywords.items()]
+            entities.append(keywords_with_scores)
         
         return entities
     
@@ -48,7 +50,8 @@ class PyateCvaluesEntities(BaseModel):
         # Extract keywords using Pyate entities
         entities = []
         for abstract in abstracts:
-            keywords = cvalues(abstract).sort_values(ascending=False).index.str.split().str[0].tolist()
-            entities.append([(ent, 1.0) for ent in keywords])
+            pyate_keywords = cvalues(abstract)
+            keywords_with_scores = [(keyword, score) for keyword, score in pyate_keywords.items()]
+            entities.append(keywords_with_scores)
         
         return entities

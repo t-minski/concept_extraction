@@ -22,8 +22,17 @@ class TfIdfEntities(BaseModel):
         # Extract keywords using Tf-Idf entities
         entities = []
         for abstract in abstracts:
+            # Fit and transform the abstract to get the TF-IDF matrix
             tfidf_matrix = self.tfidf_vectorizer.fit_transform([abstract])
-            keywords = self.tfidf_vectorizer.get_feature_names_out()
-            entities.append([(ent, 1.0) for ent in keywords])
-        
+            
+            # Get the feature names (keywords) and their corresponding TF-IDF scores
+            feature_names = self.tfidf_vectorizer.get_feature_names_out()
+            tfidf_scores = tfidf_matrix.toarray()[0]
+            
+            # Create a list of tuples (keyword, score)
+            keywords_with_scores = [(feature_names[idx], tfidf_scores[idx]) for idx in tfidf_scores.argsort()[::-1]]
+            
+            # Append the keywords with their scores to the entities list
+            entities.append(keywords_with_scores)
+    
         return entities

@@ -14,7 +14,7 @@ class SummaEntities(BaseModel):
         # Extract keywords using Summa entities
         entities = []
         for abstract in abstracts:
-            keywords = [keyword[0] for keyword in summa_keywords.keywords(abstract, scores=True)]
-            entities.append([(ent, 1.0) for ent in keywords])
+            keywords_with_scores = [(keyword[0], keyword[1]) for keyword in summa_keywords.keywords(abstract, scores=True)]
+            entities.append(keywords_with_scores)
         
         return entities
