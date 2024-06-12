@@ -100,7 +100,7 @@ def cli_evaluate() -> None:
     #parser = setup_parser()
     #args = parse_eval_args(parser)
 
-    models = get_models(['Llama2_7b_OneShotEntities']) #args.models)
+    models = get_models(['Llama3_8b_ZeroShotEntities']) #args.models)
     datasets = get_datasets(['inspec']) #args.datasets)
 
     evaluate(models, datasets, 'output')#args.output)
