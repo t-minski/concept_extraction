@@ -6,6 +6,7 @@ import torch
 from torch import cuda
 from models.base_model import BaseModel
 from typing import List, Tuple
+from keybert.llm import TextGeneration
 from huggingface_hub import login
 login("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")
 
