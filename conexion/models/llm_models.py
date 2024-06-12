@@ -1,6 +1,7 @@
 from keybert import KeyBERT
 from torch import bfloat16
 import transformers
+from ctransformers import AutoModelForCausalLM as CAutoModelForCausalLM
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import torch
 from torch import cuda

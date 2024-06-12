@@ -2,7 +2,7 @@ from summa import keywords as summa_keywords
 from models.base_model import BaseModel
 from typing import List, Tuple
 
-class RakeEntities(BaseModel):
+class SummaEntities(BaseModel):
     
     def __init__(self):
         pass
@@ -14,7 +14,7 @@ class RakeEntities(BaseModel):
         # Extract keywords using Summa entities
         entities = []
         for abstract in abstracts:
-            keywords_ = [keyword[0] for keyword in summa_keywords.keywords(abstract, scores=True)]
+            keywords = [keyword[0] for keyword in summa_keywords.keywords(abstract, scores=True)]
             entities.append([(ent, 1.0) for ent in keywords])
         
         return entities

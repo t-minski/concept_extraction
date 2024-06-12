@@ -37,9 +37,24 @@ def setup_parser() -> argparse.ArgumentParser:
 models_map = {
     "SpacyEntities": ("models.spacy_models", "SpacyEntities"),
     "SpacyNounChunks": ("models.spacy_models", "SpacyNounChunks"),
+    "TfIdfEntities": ("models.tfidf_models", "TfIdfEntities"),
+    "YakeEntities": ("models.yake_models", "YakeEntities"),
+    "SummaEntities": ("models.summa_models", "SummaEntities"),
+    "RakeEntities": ("models.rake_models", "RakeEntities"),
+    "PyateBasicsEntities": ("models.pyate_models", "PyateBasicsEntities"),
+    "PyateComboBasicEntities": ("models.pyate_models", "PyateComboBasicEntities"),
+    "PyateCvaluesEntities": ("models.pyate_models", "PyateCvaluesEntities"),
+    "LSAEntities": ("models.lsa_models", "LSAEntities"),
+    "LDAEntities": ("models.lda_models", "LDAEntities"),
     "KeyBERTEntities": ("models.llm_models", "KeyBERTEntities"),
     "Llama2_7b_ZeroShotEntities": ("models.llm_models", "Llama2_7b_ZeroShotEntities"),
     "Llama2_7b_OneShotEntities": ("models.llm_models", "Llama2_7b_OneShotEntities"),
+    "Llama3_8b_ZeroShotEntities": ("models.llm_models", "Llama3_8b_ZeroShotEntities"),
+    "Llama3_8b_OneShotEntities": ("models.llm_models", "Llama3_8b_OneShotEntities"),
+    "Mistral_7b_ZeroShotEntities": ("models.llm_models", "Mistral_7b_ZeroShotEntities"),
+    "Mistral_7b_OneShotEntities": ("models.llm_models", "Mistral_7b_OneShotEntities"),    
+    "Mixtral_7b_ZeroShotEntities": ("models.llm_models", "Mixtral_7b_ZeroShotEntities"),
+    "Mixtral_7b_OneShotEntities": ("models.llm_models", "Mixtral_7b_OneShotEntities"),
 }
 
 def get_models(model_texts: List[str]) -> List:
@@ -53,7 +68,10 @@ def get_models(model_texts: List[str]) -> List:
     return models
 
 dataset_map = {
-    "inspec": ("data.inspec_dataset", "Inspec"),
+    "inspec": ("data.inspec_dataset", "inspec"),
+    "kp20k": ("data.kp20k_dataset", "kp20k"),
+    "semeval2010": ("data.semeval2010_dataset", "semeval2010"),
+    "semeval2017": ("data.semeval2017_dataset", "semeval2017"),
 }
 
 def get_datasets(dataset_texts: List[str]) -> List:
