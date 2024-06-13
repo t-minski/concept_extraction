@@ -62,6 +62,8 @@ models_map = {
 }
 
 def get_models(model_texts: List[str]) -> List:
+    if "all" in model_texts:
+        model_texts = list(models_map.keys())
     models = []
     for model_text in model_texts:
         if model_text not in models_map:
@@ -79,6 +81,8 @@ dataset_map = {
 }
 
 def get_datasets(dataset_texts: List[str]) -> List:
+    if "all" in dataset_texts:
+        dataset_texts = list(dataset_map.keys())
     datasets = []
     for dataset_text in dataset_texts:
         if dataset_text not in dataset_map:
