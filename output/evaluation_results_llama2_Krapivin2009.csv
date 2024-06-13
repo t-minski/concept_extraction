@@ -1,5 +1,0 @@
-Ground_truth Keywords,Extracted Keywords,Method,Precision,Recall,F1-score,n_gt_keywords,n_extraced_leywords
-"['group communication', 'provable security', 'universal composability', 'group key exchange']",[],llama2_KeyBERT_zero_shot,0.0,0.0,0.0,4,0
-"['group communication', 'provable security', 'universal composability', 'group key exchange']","['cooperative multi-robot system', 'heterogeneous', 'bottom-up', 'autonomous mobile robots', 'purposive navigation', 'map building', 'symbolic communication', 'behavior-based system', 'adaptive symbol grounding hypothesis']",llama2_KeyBERT_one_shot,0.0,0.0,0.0,4,9
-"['domain decomposition', 'multisplitting', 'waveform relaxation', 'overlapping Schwarz']",[],llama2_KeyBERT_zero_shot,0.0,0.0,0.0,4,0
-"['domain decomposition', 'multisplitting', 'waveform relaxation', 'overlapping Schwarz']","['security protocols', 'sensitive messages', 'TLS', 'SSL', 'higher-order logic', 'proofs', 'Isabelle', 'optional parts', 'man-weeks', 'processor time']",llama2_KeyBERT_one_shot,0.0,0.0,0.0,4,10

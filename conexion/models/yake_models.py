@@ -17,7 +17,7 @@ class YakeEntities(BaseModel):
         entities = []
         for abstract in abstracts:
             yake_keywords = self.kw_extractor.extract_keywords(abstract)
-            keywords = [keyword[0] for keyword in yake_keywords]
-            entities.append([(ent, 1.0) for ent in keywords])
+            keywords_with_scores = [(keyword[0], keyword[1]) for keyword in yake_keywords]
+            entities.append(keywords_with_scores)
         
         return entities

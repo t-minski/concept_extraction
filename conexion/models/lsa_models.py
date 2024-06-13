@@ -27,7 +27,11 @@ class LSAEntities(BaseModel):
             tfidf_matrix = self.tfidf_vectorizer.fit_transform([abstract])
             tfidf_keywords = self.tfidf_vectorizer.get_feature_names_out()
             lsa_matrix = self.lsa_model.fit_transform(tfidf_matrix)
-            keywords = [tfidf_keywords[i] for i in self.lsa_model.components_[0].argsort()[::-1]]
-            entities.append([(ent, 1.0) for ent in keywords])
+            
+            # Get the components and their scores
+            components = self.lsa_model.components_[0]
+            keywords_with_scores = [(tfidf_keywords[i], components[i]) for i in components.argsort()[::-1]]
+            
+            entities.append(keywords_with_scores)
         
         return entities

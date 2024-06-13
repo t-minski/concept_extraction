@@ -14,7 +14,7 @@ login("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")
 class KeyBERTEntities(BaseModel):
     
     def __init__(self):
-        self.keybert_model = KeyBERT()
+        self.kw_model = KeyBERT()
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
         pass
@@ -23,8 +23,13 @@ class KeyBERTEntities(BaseModel):
         # Extract keywords using KeyBERT entities
         entities = []
         for abstract in abstracts:
-            keywords = [keyword[0] for keyword in self.keybert_model.extract_keywords(abstract, keyphrase_ngram_range=(1, 3), stop_words='english')] #keyphrase_ngram_range=(1, 3),
-            entities.append([(ent, 1.0) for ent in keywords])
+            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)
+            keywords_with_scores = [
+                                    (keyword.rstrip('.'), score) 
+                                    for keyword, score in keywords 
+                                    if keyword.rstrip('.').lower() in abstract.lower()
+                                    ]
+            entities.append(keywords_with_scores)
         
         return entities
 

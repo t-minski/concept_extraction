@@ -15,7 +15,8 @@ class RakeEntities(BaseModel):
         entities = []
         for abstract in abstracts:
             self.rake_nltk_var.extract_keywords_from_text(abstract)
-            keywords = self.rake_nltk_var.get_ranked_phrases()
-            entities.append([(ent, 1.0) for ent in keywords])
+            keywords = self.rake_nltk_var.get_ranked_phrases_with_scores()
+            keywords_with_scores = [(keyword[1], keyword[0]) for keyword in keywords]
+            entities.append(keywords_with_scores)
         
         return entities

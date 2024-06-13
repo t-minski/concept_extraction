@@ -25,4 +25,5 @@ packages = [
 for package in packages:
     install(package)
 
-subprocess.check_call([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
+subprocess.check_call([sys.executable, "-m", "spacy", "download", "en_core_web_lg"])
+subprocess.check_call([sys.executable, "-m", "spacy", "download", "en_core_sci_lg"])
