@@ -39,6 +39,7 @@ models_map = {
     "SpacyNounChunks": ("models.spacy_models", "SpacyNounChunks"),
     "TfIdfEntities": ("models.tfidf_models", "TfIdfEntities"),
     "YakeEntities": ("models.yake_models", "YakeEntities"),
+    "pkeYAKEEntities": ("models.pkeYAKE_models", "pkeYAKEEntities"),
     "SummaEntities": ("models.summa_models", "SummaEntities"),
     "RakeEntities": ("models.rake_models", "RakeEntities"),
     "PyateBasicsEntities": ("models.pyate_models", "PyateBasicsEntities"),
@@ -46,10 +47,10 @@ models_map = {
     "PyateCvaluesEntities": ("models.pyate_models", "PyateCvaluesEntities"),
     "LSAEntities": ("models.lsa_models", "LSAEntities"),
     "LDAEntities": ("models.lda_models", "LDAEntities"),
-    "TopicRank": ("models.TopicRank_models", "TopicRank"),
-    "TopicalPageRank": ("models.TopicalPageRank_models", "TopicalPageRank"),
-    "PositionRank": ("models.PositionRank_models", "PositionRank"),
-    "MultipartiteRank": ("models.MultipartiteRank_models", "MultipartiteRank"),
+    "TopicRankEntities": ("models.TopicRank_models", "TopicRankEntities"),
+    "TopicalPageRankEntities": ("models.TopicalPageRank_models", "TopicalPageRankEntities"),
+    "PositionRankEntities": ("models.PositionRank_models", "PositionRankEntities"),
+    "MultipartiteRankEntities": ("models.MultipartiteRank_models", "MultipartiteRankEntities"),
     "KeyBERTEntities": ("models.llm_models", "KeyBERTEntities"),
     "Llama2_7b_ZeroShotEntities": ("models.llm_models", "Llama2_7b_ZeroShotEntities"),
     "Llama2_7b_OneShotEntities": ("models.llm_models", "Llama2_7b_OneShotEntities"),
@@ -110,7 +111,7 @@ def cli_evaluate() -> None:
     log_format = "%(asctime)s %(levelname)s %(message)s"
     logging.basicConfig(level=logging.INFO, format=log_format)
     
-    models = get_models(['TfIdfEntities']) #args.models)
+    models = get_models(['pkeYAKEEntities']) #args.models)
     datasets = get_datasets(['inspec']) #args.datasets)
 
     evaluate(models, datasets, 'output')#args.output)
