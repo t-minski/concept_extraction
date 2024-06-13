@@ -103,8 +103,10 @@ def parse_eval_args(parser: argparse.ArgumentParser) -> argparse.Namespace:
 def cli_evaluate() -> None:
     #parser = setup_parser()
     #args = parse_eval_args(parser)
-
-    models = get_models(['Llama3_8b_OneShotEntities']) #args.models)
+    log_format = "%(asctime)s %(levelname)s %(message)s"
+    logging.basicConfig(level=logging.INFO, format=log_format)
+    
+    models = get_models(['TfIdfEntities']) #args.models)
     datasets = get_datasets(['inspec']) #args.datasets)
 
     evaluate(models, datasets, 'output')#args.output)
