@@ -18,6 +18,7 @@ def log_statistics(documents, extractive_keyphrases):
     unfiltered_keyphrases_per_document = []
 
     total_documents = len(documents)
+    total_documents_with_no_keyphrases = 0
     total_keyphrases = 0
     total_filtered_keyphrases = 0
     total_unfiltered_keyphrases = 0
@@ -26,6 +27,10 @@ def log_statistics(documents, extractive_keyphrases):
     total_noun_phrase_keyphrases = 0
 
     for tokens, keyphrases in zip(documents, extractive_keyphrases):
+        if not keyphrases:  # Skip if there are no ground truth keyphrases
+            total_documents_with_no_keyphrases += 1
+            continue
+        
         document_text = ' '.join(tokens)
         filtered_phrases = [phrase for phrase in keyphrases if phrase in document_text]
         unfiltered_phrases = [phrase for phrase in keyphrases if phrase not in document_text]
@@ -77,6 +82,7 @@ def log_statistics(documents, extractive_keyphrases):
 
     # Log statistics
     logger.info(f"Total documents: {total_documents}")
+    logger.info(f"Total documents with no keyphrases: {total_documents_with_no_keyphrases}")
     logger.info(f"Total keyphrases: {total_keyphrases}")
     logger.info(f"Total filtered keyphrases: {total_filtered_keyphrases}")
     logger.info(f"Total unfiltered keyphrases: {total_unfiltered_keyphrases}")
