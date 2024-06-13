@@ -25,15 +25,15 @@ def log_statistics(documents, extractive_keyphrases):
 
     total_named_entity_keyphrases = 0
     total_noun_phrase_keyphrases = 0
-
-    for tokens, keyphrases in zip(documents, extractive_keyphrases):
-        if not keyphrases:  # Skip if there are no ground truth keyphrases
-            total_documents_with_no_keyphrases += 1
-            continue
-        
+    
+    for tokens, keyphrases in zip(documents, extractive_keyphrases):        
         document_text = ' '.join(tokens)
         filtered_phrases = [phrase for phrase in keyphrases if phrase in document_text]
         unfiltered_phrases = [phrase for phrase in keyphrases if phrase not in document_text]
+        
+        if not filtered_phrases:  # Skip if there are no ground truth keyphrases
+            total_documents_with_no_keyphrases += 1
+            continue
         
         # Named entity recognition
         doc_sci = nlp_sci(document_text)
