@@ -113,15 +113,15 @@ def parse_eval_args(parser: argparse.ArgumentParser) -> argparse.Namespace:
     return args
 
 def cli_evaluate() -> None:
-    #parser = setup_parser()
-    #args = parse_eval_args(parser)
-    log_format = "%(asctime)s %(levelname)s %(message)s"
-    logging.basicConfig(level=logging.INFO, format=log_format)
+    parser = setup_parser()
+    args = parse_eval_args(parser)
+    #log_format = "%(asctime)s %(levelname)s %(message)s"
+    #logging.basicConfig(level=logging.INFO, format=log_format)
     
-    models = get_models(["pke_Kea"]) #args.models)
-    datasets = get_datasets(['inspec']) #args.datasets)
+    models = get_models(args.models) #["LDAEntities"]) 
+    datasets = get_datasets(args.datasets) #['inspec']) 
 
-    evaluate(models, datasets, 'output')#args.output)
+    evaluate(models, datasets, args.output) #'output')
 
 if __name__ == "__main__":
     cli_evaluate()

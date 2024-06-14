@@ -13,6 +13,16 @@ models=(
     "PyateCvaluesEntities"
     "LSAEntities"
     "LDAEntities"
+    "pke_FirstPhrases"
+    "pke_TextRank"
+    "pke_SingleRank"
+    "pke_TopicRank"
+    "pke_MultipartiteRank"
+    "pke_TfIdf"
+    "pke_TopicalPageRank"
+    "pke_YAKE"
+    "pke_KPMiner"
+    "pke_Kea"
     "KeyBERTEntities"
     "Llama2_7b_ZeroShotEntities"
     "Llama2_7b_OneShotEntities"
@@ -47,7 +57,7 @@ do
         echo "Running model ${model} on dataset ${dataset}, output will be logged to ${log_file}"
         
         # Run the command and log the output, continue to next command even if there is an error
-        nohup python3 main.py --models ${model} --datasets ${dataset} --output ${output_folder} > ${log_file} 2>&1
+        python3 conexion/main.py --models ${model} --datasets ${dataset} --output ${output_folder} -v > ${log_file} 2>&1
         
         if [ $? -ne 0 ]; then
             echo "Error encountered with model ${model} on dataset ${dataset}. Check ${log_file} for details."
