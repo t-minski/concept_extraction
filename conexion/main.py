@@ -39,7 +39,6 @@ models_map = {
     "SpacyNounChunks": ("models.spacy_models", "SpacyNounChunks"),
     "TfIdfEntities": ("models.tfidf_models", "TfIdfEntities"),
     "YakeEntities": ("models.yake_models", "YakeEntities"),
-    "pkeYAKEEntities": ("models.pkeYAKE_models", "pkeYAKEEntities"),
     "SummaEntities": ("models.summa_models", "SummaEntities"),
     "RakeEntities": ("models.rake_models", "RakeEntities"),
     "PyateBasicsEntities": ("models.pyate_models", "PyateBasicsEntities"),
@@ -47,10 +46,18 @@ models_map = {
     "PyateCvaluesEntities": ("models.pyate_models", "PyateCvaluesEntities"),
     "LSAEntities": ("models.lsa_models", "LSAEntities"),
     "LDAEntities": ("models.lda_models", "LDAEntities"),
-    "TopicRankEntities": ("models.TopicRank_models", "TopicRankEntities"),
-    "TopicalPageRankEntities": ("models.TopicalPageRank_models", "TopicalPageRankEntities"),
-    "PositionRankEntities": ("models.PositionRank_models", "PositionRankEntities"),
-    "MultipartiteRankEntities": ("models.MultipartiteRank_models", "MultipartiteRankEntities"),
+    
+    "pke_FirstPhrases": ("models.pke_models", "pke_FirstPhrases"),
+    "pke_TextRank": ("models.pke_models", "pke_TextRank"),
+    "pke_SingleRank": ("models.pke_models", "pke_SingleRank"),
+    "pke_TopicRank": ("models.pke_models", "pke_TopicRank"),
+    "pke_MultipartiteRank": ("models.pke_models", "pke_MultipartiteRank"),
+    "pke_TfIdf": ("models.pke_models", "pke_TfIdf"),
+    "pke_TopicalPageRank": ("models.pke_models", "pke_TopicalPageRank"),
+    "pke_YAKE": ("models.pke_models", "pke_YAKE"),
+    "pke_KPMiner": ("models.pke_models", "pke_KPMiner"),
+    "pke_Kea": ("models.pke_models", "pke_Kea"),
+    
     "KeyBERTEntities": ("models.llm_models", "KeyBERTEntities"),
     "Llama2_7b_ZeroShotEntities": ("models.llm_models", "Llama2_7b_ZeroShotEntities"),
     "Llama2_7b_OneShotEntities": ("models.llm_models", "Llama2_7b_OneShotEntities"),
@@ -111,7 +118,7 @@ def cli_evaluate() -> None:
     log_format = "%(asctime)s %(levelname)s %(message)s"
     logging.basicConfig(level=logging.INFO, format=log_format)
     
-    models = get_models(['pkeYAKEEntities']) #args.models)
+    models = get_models(["pke_Kea"]) #args.models)
     datasets = get_datasets(['inspec']) #args.datasets)
 
     evaluate(models, datasets, 'output')#args.output)

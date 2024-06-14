@@ -29,10 +29,7 @@ def evaluate_p_r_f_at_k(keyphrases : List[Tuple[str, float]], references : List[
     
     # combine the keyphrases and the references
     all_keywords = set(references).union([keyphrase for keyphrase, conf_value in keyphrases])
-    y_true = [1 if keyphrase in references else 0 for keyphrase in all_keywords]
-    if sum(y_true) == 0:
-        print('summ is zero')
-        
+    y_true = [1 if keyphrase in references else 0 for keyphrase in all_keywords]        
     y_scores = []
     for keyphrase in all_keywords:
         for keyphrase_pred, conf_value in keyphrases:

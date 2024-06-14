@@ -1,11 +1,10 @@
-# data_cs
-data_cs/SemEval2010/*
-data_cs/Krapivin2009/*
-data_cs/SemEval2017/*
 
-# logs
+# logs, csv files and large files
 *.log
 *.docbin
+*.gz
+*.pickle
+*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

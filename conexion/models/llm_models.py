@@ -89,9 +89,13 @@ class Llama2_7b_ZeroShotEntities(BaseModel):
         # Extract keywords using llama2 entities
         entities = []
         for abstract in abstracts:
-            raw_keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)[0]
-            keywords = [keyword.rstrip('.') for keyword in raw_keywords if keyword.rstrip('.').lower() in abstract.lower()]
-            entities.append([(ent, 1.0) for ent in keywords])
+            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)
+            keywords_with_scores = [
+                                    (keyword.rstrip('.'), score) 
+                                    for keyword, score in keywords 
+                                    if keyword.rstrip('.').lower() in abstract.lower()
+                                    ]
+            entities.append(keywords_with_scores)
         
         return entities
 
@@ -161,9 +165,13 @@ class Llama2_7b_OneShotEntities(BaseModel):
         # Extract keywords using llama2 entities
         entities = []
         for abstract in abstracts:
-            raw_keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)[0]
-            keywords = [keyword.rstrip('.') for keyword in raw_keywords if keyword.rstrip('.').lower() in abstract.lower()]
-            entities.append([(ent, 1.0) for ent in keywords])
+            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)
+            keywords_with_scores = [
+                                    (keyword.rstrip('.'), score) 
+                                    for keyword, score in keywords 
+                                    if keyword.rstrip('.').lower() in abstract.lower()
+                                    ]
+            entities.append(keywords_with_scores)
         
         return entities
     
@@ -223,9 +231,13 @@ class Llama3_8b_ZeroShotEntities(BaseModel):
         # Extract keywords using llama2 entities
         entities = []
         for abstract in abstracts:
-            raw_keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)[0]
-            keywords = [keyword.rstrip('.') for keyword in raw_keywords if keyword.rstrip('.').lower() in abstract.lower()]
-            entities.append([(ent, 1.0) for ent in keywords])
+            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)
+            keywords_with_scores = [
+                                    (keyword.rstrip('.'), score) 
+                                    for keyword, score in keywords 
+                                    if keyword.rstrip('.').lower() in abstract.lower()
+                                    ]
+            entities.append(keywords_with_scores)
         
         return entities
 
@@ -295,9 +307,13 @@ class Llama3_8b_OneShotEntities(BaseModel):
         # Extract keywords using llama2 entities
         entities = []
         for abstract in abstracts:
-            raw_keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)[0]
-            keywords = [keyword.rstrip('.') for keyword in raw_keywords if keyword.rstrip('.').lower() in abstract.lower()]
-            entities.append([(ent, 1.0) for ent in keywords])
+            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)
+            keywords_with_scores = [
+                                    (keyword.rstrip('.'), score) 
+                                    for keyword, score in keywords 
+                                    if keyword.rstrip('.').lower() in abstract.lower()
+                                    ]
+            entities.append(keywords_with_scores)
         
         return entities
 
@@ -339,7 +355,7 @@ class Mistral_7b_ZeroShotEntities(BaseModel):
         prompt = keyword_prompt
         
         llm = TextGeneration(generator, prompt=prompt)
-        self.model = KeyBERT(llm=llm, model='BAAI/bge-small-en-v1.5')
+        self.kw_model = KeyBERT(llm=llm, model='BAAI/bge-small-en-v1.5')
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
         pass
@@ -348,9 +364,13 @@ class Mistral_7b_ZeroShotEntities(BaseModel):
         # Extract keywords using KeyBERT entities
         entities = []
         for abstract in abstracts:
-            raw_keywords = self.model.extract_keywords([abstract], threshold=0.5)[0]
-            keywords = [keyword.rstrip('.') for keyword in raw_keywords if keyword.rstrip('.').lower() in abstract.lower()]
-            entities.append([(ent, 1.0) for ent in keywords])
+            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)
+            keywords_with_scores = [
+                                    (keyword.rstrip('.'), score) 
+                                    for keyword, score in keywords 
+                                    if keyword.rstrip('.').lower() in abstract.lower()
+                                    ]
+            entities.append(keywords_with_scores)
         
         return entities
 
@@ -404,7 +424,7 @@ class Mistral_7b_OneShotEntities(BaseModel):
         prompt = example_prompt + keyword_prompt
         
         llm = TextGeneration(generator, prompt=prompt)
-        self.model = KeyBERT(llm=llm, model='BAAI/bge-small-en-v1.5')
+        self.kw_model = KeyBERT(llm=llm, model='BAAI/bge-small-en-v1.5')
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
         pass
@@ -413,9 +433,13 @@ class Mistral_7b_OneShotEntities(BaseModel):
         # Extract keywords using KeyBERT entities
         entities = []
         for abstract in abstracts:
-            raw_keywords = self.model.extract_keywords([abstract], threshold=0.5)[0]
-            keywords = [keyword.rstrip('.') for keyword in raw_keywords if keyword.rstrip('.').lower() in abstract.lower()]
-            entities.append([(ent, 1.0) for ent in keywords])
+            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)
+            keywords_with_scores = [
+                                    (keyword.rstrip('.'), score) 
+                                    for keyword, score in keywords 
+                                    if keyword.rstrip('.').lower() in abstract.lower()
+                                    ]
+            entities.append(keywords_with_scores)
         
         return entities
     
@@ -450,7 +474,7 @@ class Mixtral_7b_ZeroShotEntities(BaseModel):
         prompt = keyword_prompt
         
         llm = TextGeneration(generator, prompt=prompt)
-        self.model = KeyBERT(llm=llm, model='BAAI/bge-small-en-v1.5')
+        self.kw_model = KeyBERT(llm=llm, model='BAAI/bge-small-en-v1.5')
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
         pass
@@ -459,9 +483,13 @@ class Mixtral_7b_ZeroShotEntities(BaseModel):
         # Extract keywords using KeyBERT entities
         entities = []
         for abstract in abstracts:
-            raw_keywords = self.model.extract_keywords([abstract], threshold=0.5)[0]
-            keywords = [keyword.rstrip('.') for keyword in raw_keywords if keyword.rstrip('.').lower() in abstract.lower()]
-            entities.append([(ent, 1.0) for ent in keywords])
+            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)
+            keywords_with_scores = [
+                                    (keyword.rstrip('.'), score) 
+                                    for keyword, score in keywords 
+                                    if keyword.rstrip('.').lower() in abstract.lower()
+                                    ]
+            entities.append(keywords_with_scores)
         
         return entities
 
@@ -508,7 +536,7 @@ class Mixtral_7b_OneShotEntities(BaseModel):
         prompt = example_prompt + keyword_prompt
         
         llm = TextGeneration(generator, prompt=prompt)
-        self.model = KeyBERT(llm=llm, model='BAAI/bge-small-en-v1.5')
+        self.kw_model = KeyBERT(llm=llm, model='BAAI/bge-small-en-v1.5')
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
         pass
@@ -517,8 +545,12 @@ class Mixtral_7b_OneShotEntities(BaseModel):
         # Extract keywords using KeyBERT entities
         entities = []
         for abstract in abstracts:
-            raw_keywords = self.model.extract_keywords([abstract], threshold=0.5)[0]
-            keywords = [keyword.rstrip('.') for keyword in raw_keywords if keyword.rstrip('.').lower() in abstract.lower()]
-            entities.append([(ent, 1.0) for ent in keywords])
+            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)
+            keywords_with_scores = [
+                                    (keyword.rstrip('.'), score) 
+                                    for keyword, score in keywords 
+                                    if keyword.rstrip('.').lower() in abstract.lower()
+                                    ]
+            entities.append(keywords_with_scores)
         
         return entities
