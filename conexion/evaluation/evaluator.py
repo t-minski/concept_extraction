@@ -61,14 +61,15 @@ def evaluate(models, datasets, output_folder):
         for model in models:
             type_model = model.__class__.__name__
 
-            logger.info(f"Evaluating model {type_model} on {type_dataset}")
-
+            logger.info(f"Run training of model {type_model} on {type_dataset}")
             # Train the model
             model.fit(training_abstracts, training_concepts)
             
+            logger.info(f"Run prediction of model {type_model} on {type_dataset}")
             # Predict the concepts
             predicted_concepts_with_confidence = model.predict(test_abstracts)
             
+            logger.info(f"Run evaluation of model {type_model} on {type_dataset}")
             # Evaluate the predictions
             cumulative_precision, cumulative_recall, cumulative_f1_score = 0, 0, 0
             cumulative_gt_keywords = 0
