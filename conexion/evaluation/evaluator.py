@@ -2,6 +2,7 @@ import os
 import csv
 from typing import List, Tuple
 import logging
+import time
 from sklearn.metrics import ndcg_score, average_precision_score
 
 logger = logging.getLogger(__name__)
@@ -61,13 +62,18 @@ def evaluate(models, datasets, output_folder):
         for model in models:
             type_model = model.__class__.__name__
 
-            logger.info(f"Run training of model {type_model} on {type_dataset}")
-            # Train the model
-            model.fit(training_abstracts, training_concepts)
             
-            logger.info(f"Run prediction of model {type_model} on {type_dataset}")
+            # Train the model
+            logger.info(f"Run training of model {type_model} on {type_dataset}")
+            start_time = time.time()
+            model.fit(training_abstracts, training_concepts)
+            training_time = time.time() - start_time
+
             # Predict the concepts
+            logger.info(f"Run prediction of model {type_model} on {type_dataset}")
+            start_time = time.time()
             predicted_concepts_with_confidence = model.predict(test_abstracts)
+            prediction_time = time.time() - start_time
             
             logger.info(f"Run evaluation of model {type_model} on {type_dataset}")
             # Evaluate the predictions
@@ -137,14 +143,13 @@ def evaluate(models, datasets, output_folder):
 
             # Write ground truth keywords, extracted keywords, and evaluation results to CSV files
             
-                
-                
-            
             with open(os.path.join(output_folder, f'evaluation_results_avg_{type_model}_{type_dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
                 writer = csv.writer(csvfile)
-                writer.writerow(['Precision', 'Recall', 'F1-score', 'avg_n_gt_keywords', 'avg_n_extraced_leywords', 'P@5', 'R@5', 'F@5', 'P@10', 'R@10', 'F@10', 'P@15', 'R@15', 'F@15', 'NDCG', 'MAP'])
+                writer.writerow(['Precision', 'Recall', 'F1-score', 'avg_n_gt_keywords', 'avg_n_extraced_leywords', 'P@5', 'R@5', 'F@5', 'P@10', 'R@10', 'F@10', 'P@15', 'R@15', 'F@15', 'NDCG', 'MAP', 'training seconds', 'prediction seconds])
                 writer.writerow([average_precision, average_recall, average_f1_score, average_gt_keywords, average_extracted_keywords,
                                  average_precision_5, average_recall_5, average_f1_score_5,
                                  average_precision_10, average_recall_10, average_f1_score_10,
                                  average_precision_15, average_recall_15, average_f1_score_15,
-                                 ndcg, map])
+                                 ndcg, map, training_time, prediction_time])
+            
+            logger.info(f"Finished evaluation of model {type_model} on {type_dataset}")
