@@ -145,7 +145,7 @@ def evaluate(models, datasets, output_folder):
             
             with open(os.path.join(output_folder, f'evaluation_results_avg_{type_model}_{type_dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
                 writer = csv.writer(csvfile)
-                writer.writerow(['Precision', 'Recall', 'F1-score', 'avg_n_gt_keywords', 'avg_n_extraced_leywords', 'P@5', 'R@5', 'F@5', 'P@10', 'R@10', 'F@10', 'P@15', 'R@15', 'F@15', 'NDCG', 'MAP', 'training seconds', 'prediction seconds])
+                writer.writerow(['Precision', 'Recall', 'F1-score', 'avg_n_gt_keywords', 'avg_n_extraced_leywords', 'P@5', 'R@5', 'F@5', 'P@10', 'R@10', 'F@10', 'P@15', 'R@15', 'F@15', 'NDCG', 'MAP', 'training seconds', 'prediction seconds'])
                 writer.writerow([average_precision, average_recall, average_f1_score, average_gt_keywords, average_extracted_keywords,
                                  average_precision_5, average_recall_5, average_f1_score_5,
                                  average_precision_10, average_recall_10, average_f1_score_10,

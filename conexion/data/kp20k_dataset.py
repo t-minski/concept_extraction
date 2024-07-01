@@ -11,7 +11,7 @@ class kp20k(BaseDataset):
                                                                     training_dataset["extractive_keyphrases"]
                                                                 )
 
-        return filtered_documents, filtered_keyphrases
+        return filtered_documents[:1000], filtered_keyphrases[:1000]
         
     def get_test_data(self) -> Tuple[List[str], List[List[str]]]:
         test_dataset = load_dataset("midas/kp20k", "generation", split="test", revision="a871c01", trust_remote_code=True)
