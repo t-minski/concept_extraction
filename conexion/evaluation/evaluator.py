@@ -88,7 +88,7 @@ def evaluate(models, datasets, output_folder):
             
             with open(os.path.join(output_folder, f'evaluation_results_{type_model}_{type_dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
                 writer = csv.writer(csvfile)
-                writer.writerow(['Ground_truth Keywords', 'Extracted Keywords', 'Precision', 'Recall', 'F1-score', 'n_gt_keywords', 'n_extraced_leywords'
+                writer.writerow(['Ground_truth Keywords', 'Extracted Keywords', 'Precision', 'Recall', 'F1-score', 'n_gt_keywords', 'n_extraced_leywords',
                                  'P@5', 'R@5', 'F@5', 'P@10', 'R@10', 'F@10', 'P@15', 'R@15', 'F@15', 'NDCG', 'MAP'])
 
                 # Calculate the precision, recall, and F1 score

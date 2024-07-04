@@ -58,6 +58,7 @@ models_map = {
     "pke_KPMiner": ("models.pke_models", "pke_KPMiner"),
     "pke_Kea": ("models.pke_models", "pke_Kea"),
     
+    "EmbedRank": ("models.EmbedRank_models", "EmbedRank"),
     "KeyBERTEntities": ("models.llm_models", "KeyBERTEntities"),
     "Llama2_7b_ZeroShotEntities": ("models.llm_models", "Llama2_7b_ZeroShotEntities"),
     "Llama2_7b_OneShotEntities": ("models.llm_models", "Llama2_7b_OneShotEntities"),

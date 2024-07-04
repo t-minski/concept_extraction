@@ -23,7 +23,8 @@ class KeyBERTEntities(BaseModel):
         # Extract keywords using KeyBERT entities
         entities = []
         for abstract in abstracts:
-            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)
+            keywords = self.kw_model.extract_keywords([abstract], keyphrase_ngram_range=(1, 3), use_mmr=True, diversity=0.5,
+                                         stop_words='english', top_n=10)
             keywords_with_scores = [
                                     (keyword.rstrip('.'), score) 
                                     for keyword, score in keywords 
@@ -89,7 +90,8 @@ class Llama2_7b_ZeroShotEntities(BaseModel):
         # Extract keywords using llama2 entities
         entities = []
         for abstract in abstracts:
-            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)[0]
+            keywords = self.kw_model.extract_keywords([abstract], keyphrase_ngram_range=(1, 3), use_mmr=True, diversity=0.5,
+                                         stop_words='english', top_n=10)[0]
         
             keywords_with_scores = [
                                     (keyword.rstrip('.'), 1.) 
@@ -166,7 +168,8 @@ class Llama2_7b_OneShotEntities(BaseModel):
         # Extract keywords using llama2 entities
         entities = []
         for abstract in abstracts:
-            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)[0]
+            keywords = self.kw_model.extract_keywords([abstract], keyphrase_ngram_range=(1, 3), use_mmr=True, diversity=0.5,
+                                         stop_words='english', top_n=10)[0]
             keywords_with_scores = [
                                     (keyword.rstrip('.'), 1.) 
                                     for keyword in keywords 
@@ -232,7 +235,8 @@ class Llama3_8b_ZeroShotEntities(BaseModel):
         # Extract keywords using llama2 entities
         entities = []
         for abstract in abstracts:
-            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)[0]
+            keywords = self.kw_model.extract_keywords([abstract], keyphrase_ngram_range=(1, 3), use_mmr=True, diversity=0.5,
+                                         stop_words='english', top_n=10)[0]
             keywords_with_scores = [
                                     (keyword.rstrip('.'), 1.) 
                                     for keyword in keywords 
@@ -308,7 +312,8 @@ class Llama3_8b_OneShotEntities(BaseModel):
         # Extract keywords using llama2 entities
         entities = []
         for abstract in abstracts:
-            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)[0]
+            keywords = self.kw_model.extract_keywords([abstract], keyphrase_ngram_range=(1, 3), use_mmr=True, diversity=0.5,
+                                         stop_words='english', top_n=10)[0]
             keywords_with_scores = [
                                     (keyword.rstrip('.'), 1.) 
                                     for keyword in keywords 
@@ -358,7 +363,8 @@ class Mistral_7b_ZeroShotEntities(BaseModel):
         # Extract keywords using KeyBERT entities
         entities = []
         for abstract in abstracts:
-            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)[0]
+            keywords = self.kw_model.extract_keywords([abstract], keyphrase_ngram_range=(1, 3), use_mmr=True, diversity=0.5,
+                                         stop_words='english', top_n=10)[0]
             keywords_with_scores = [
                                     (keyword.rstrip('.'), 1.) 
                                     for keyword in keywords 
@@ -420,7 +426,8 @@ class Mistral_7b_OneShotEntities(BaseModel):
         # Extract keywords using KeyBERT entities
         entities = []
         for abstract in abstracts:
-            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)[0]
+            keywords = self.kw_model.extract_keywords([abstract], keyphrase_ngram_range=(1, 3), use_mmr=True, diversity=0.5,
+                                         stop_words='english', top_n=10)[0]
             keywords_with_scores = [
                                     (keyword.rstrip('.'), 1.) 
                                     for keyword in keywords 
@@ -470,7 +477,8 @@ class Mixtral_7b_ZeroShotEntities(BaseModel):
         # Extract keywords using KeyBERT entities
         entities = []
         for abstract in abstracts:
-            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)[0]
+            keywords = self.kw_model.extract_keywords([abstract], keyphrase_ngram_range=(1, 3), use_mmr=True, diversity=0.5,
+                                         stop_words='english', top_n=10)[0]
             keywords_with_scores = [
                                     (keyword.rstrip('.'), 1.) 
                                     for keyword in keywords 
@@ -532,7 +540,8 @@ class Mixtral_7b_OneShotEntities(BaseModel):
         # Extract keywords using KeyBERT entities
         entities = []
         for abstract in abstracts:
-            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)[0]
+            keywords = self.kw_model.extract_keywords([abstract], keyphrase_ngram_range=(1, 3), use_mmr=True, diversity=0.5,
+                                         stop_words='english', top_n=10)[0]
             keywords_with_scores = [
                                     (keyword.rstrip('.'), 1.) 
                                     for keyword in keywords 

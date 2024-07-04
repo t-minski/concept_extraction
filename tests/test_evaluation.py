@@ -50,3 +50,24 @@ def test_mean_average_precision():
 
     prf_5, prf_10, prf_15, ndcg, map =  evaluate_p_r_f_at_k(keyphrases, references)
     assert(map == pytest.approx(0.7))
+    
+def test_precision_recall():
+    # https://towardsdatascience.com/breaking-down-mean-average-precision-map-ae462f623a52
+    # 2. Average Precision and mAP for Information Retrieval
+    keyphrases = [
+        ('pos_three', 0.80),
+        ('pos_one', 0.99),
+        ('pos_six', 0.50),
+        ('pos_two', 0.90),
+        ('pos_four', 0.70),
+        ('pos_five', 0.60),
+        
+    ]
+    # https://towardsdatascience.com/demystifying-ndcg-bee3be58cfe0  search group y
+    references = ['pos_one', 'pos_four', 'pos_five']
+
+    prf_5, prf_10, prf_15, ndcg, map =  evaluate_p_r_f_at_k(keyphrases, references)
+    print(prf_5)
+    assert(prf_5[0] == 3./5. )#pytest.approx(0.7)) 
+    assert(prf_5[1] == 1.0 )
+    assert(prf_5[2] == pytest.approx(0.75) )
