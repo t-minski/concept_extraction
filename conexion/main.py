@@ -25,6 +25,10 @@ def setup_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--output", "-o", type=dir_path, help="Folder of the output files", default="output"
     )
+    
+    parser.add_argument(
+        "--template", "-t", help="Name of the template to use e.g. `template_1`", default="template_1"
+    )
 
     parser.add_argument("-v", "--verbose", help="increase output verbosity",
                     action="store_true")
@@ -60,17 +64,18 @@ models_map = {
     
     "EmbedRank": ("models.EmbedRank_models", "EmbedRank"),
     "KeyBERTEntities": ("models.llm_models", "KeyBERTEntities"),
-    "Llama2_7b_ZeroShotEntities": ("models.llm_models", "Llama2_7b_ZeroShotEntities"),
-    "Llama2_7b_OneShotEntities": ("models.llm_models", "Llama2_7b_OneShotEntities"),
-    "Llama3_8b_ZeroShotEntities": ("models.llm_models", "Llama3_8b_ZeroShotEntities"),
-    "Llama3_8b_OneShotEntities": ("models.llm_models", "Llama3_8b_OneShotEntities"),
-    "Mistral_7b_ZeroShotEntities": ("models.llm_models", "Mistral_7b_ZeroShotEntities"),
-    "Mistral_7b_OneShotEntities": ("models.llm_models", "Mistral_7b_OneShotEntities"),    
-    "Mixtral_7b_ZeroShotEntities": ("models.llm_models", "Mixtral_7b_ZeroShotEntities"),
-    "Mixtral_7b_OneShotEntities": ("models.llm_models", "Mixtral_7b_OneShotEntities"),
+    "Llama2_7b_Entities": ("models.llm_models", "Llama2_7b_Entities"),
+    "Llama2_70b_Entities": ("models.llm_models", "Llama2_70b_Entities"),
+    "Llama3_8b_Entities": ("models.llm_models", "Llama3_8b_Entities"),
+    "Llama3_70b_Entities": ("models.llm_models", "Llama3_70b_Entities"),
+    "Mistral_7b_Entities": ("models.llm_models", "Mistral_7b_Entities"),
+    "Mixtral_7b_Entities": ("models.llm_models", "Mixtral_7b_Entities"),
+    "Mixtral_22b_Entities": ("models.llm_models", "Mixtral_22b_Entities"),
+    "AdvancedConceptExtractor": ("models.conex_models", "AdvancedConceptExtractor"),
+    "GPTEntities": ("models.llm_models", "GPTEntities"),
 }
 
-def get_models(model_texts: List[str]) -> List:
+def get_models(model_texts: List[str], template_name: str) -> List:
     if "all" in model_texts:
         model_texts = list(models_map.keys())
     models = []
@@ -79,7 +84,10 @@ def get_models(model_texts: List[str]) -> List:
             raise ValueError(f"Model {model_text} not found")
         module_name, class_name = models_map[model_text]
         my_class = getattr(importlib.import_module(module_name), class_name)
-        models.append(my_class())
+        if 'llm_models' in module_name:  # Only pass template_name to LLM models
+            models.append(my_class(template_name=template_name))
+        else:
+            models.append(my_class())
     return models
 
 dataset_map = {
@@ -119,10 +127,10 @@ def cli_evaluate() -> None:
     #log_format = "%(asctime)s %(levelname)s %(message)s"
     #logging.basicConfig(level=logging.INFO, format=log_format)
     
-    models = get_models(args.models) #["LDAEntities"]) 
-    datasets = get_datasets(args.datasets) #['inspec']) 
+    models = get_models(args.models, args.template)
+    datasets = get_datasets(args.datasets)
 
-    evaluate(models, datasets, args.output) #'output')
+    evaluate(models, datasets, args.output)
 
 if __name__ == "__main__":
     cli_evaluate()
