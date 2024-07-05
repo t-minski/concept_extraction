@@ -6,3 +6,7 @@ yake @ git+https://github.com/LIAAD/yake@0fa58cc
 pyate==0.5.5
 rake-nltk==1.0.6
 summa==1.2.0
+transformers==4.41.2
+accelerate==0.31.0
+datasets==2.19.2
+lm_eval @ git+https://github.com/EleutherAI/lm-evaluation-harness@9088a68
