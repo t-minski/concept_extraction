@@ -1,6 +1,6 @@
 import argparse
 from typing import List
-from conexion.main import get_datasets
+from conexion.data import get_datasets
 import spacy
 import logging
 import statistics
