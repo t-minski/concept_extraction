@@ -8,7 +8,6 @@ from pke import train_supervised_model
 from nltk.stem.snowball import SnowballStemmer as Stemmer
 import os
 import spacy
-from spacy.tokenizer import _get_regex_pattern
 
 nlp = spacy.load("en_core_web_sm", disable=['ner', 'textcat', 'parser'])
 nlp.add_pipe("sentencizer")
@@ -39,6 +38,55 @@ infixes = (
 infix_re = compile_infix_regex(infixes)
 nlp.tokenizer.infix_finditer = infix_re.finditer
 
+
+def extract_all_candidates_from_pke_extractor(extractor):
+    redundancy_removal=False # TODO: check redundancy_removal -> yes / no
+    stemming=False
+
+    # copy of get_n_best method from pke.base
+    # inital code is kept and commented out for reference
+
+    # sort candidates by descending weight
+    best = sorted(extractor.weights, key=extractor.weights.get, reverse=True)
+
+    # remove redundant candidates
+    if redundancy_removal:
+
+        # initialize a new container for non redundant candidates
+        non_redundant_best = []
+
+        # loop through the best candidates
+        for candidate in best:
+
+            # test wether candidate is redundant
+            if extractor.is_redundant(candidate, non_redundant_best):
+                continue
+
+            # add the candidate otherwise
+            non_redundant_best.append(candidate)
+
+            # break computation if the n-best are found
+            #if len(non_redundant_best) >= n:
+            #    break
+
+        # copy non redundant candidates in best container
+        best = non_redundant_best
+
+    # get the list of best candidates as (lexical form, weight) tuples
+    #n_best = [(u, extractor.weights[u]) for u in best[:min(n, len(best))]]
+    n_best = [(u, extractor.weights[u]) for u in best]
+
+    # replace with surface forms if no stemming
+    if not stemming:
+        #n_best = [(' '.join(extractor.candidates[u].surface_forms[0]).lower(),
+        #            extractor.weights[u]) for u in best[:min(n, len(best))]]
+        n_best = [(' '.join(extractor.candidates[u].surface_forms[0]).lower(),
+                    extractor.weights[u]) for u in best]
+
+    # return the list of best candidates
+    return n_best
+
+
 class pke_FirstPhrases(BaseModel):
 
     def __init__(self):
@@ -54,7 +102,7 @@ class pke_FirstPhrases(BaseModel):
             extractor.load_document(input=abstract, language='en')
             extractor.candidate_selection()
             extractor.candidate_weighting()
-            keywords = extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
+            keywords = extract_all_candidates_from_pke_extractor(extractor) #extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
             entities.append(keywords)
         
         return entities
@@ -74,7 +122,7 @@ class pke_TextRank(BaseModel):
             extractor.load_document(input=abstract, language='en')
             extractor.candidate_selection()
             extractor.candidate_weighting()
-            keywords = extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
+            keywords = extract_all_candidates_from_pke_extractor(extractor) #extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
             entities.append(keywords)
         
         return entities
@@ -95,7 +143,7 @@ class pke_SingleRank(BaseModel):
             extractor.load_document(input=abstract, language='en')
             extractor.candidate_selection()
             extractor.candidate_weighting()
-            keywords = extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
+            keywords = extract_all_candidates_from_pke_extractor(extractor) #extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
             entities.append(keywords)
         
         return entities
@@ -151,7 +199,7 @@ class pke_Kea(BaseModel):
             extractor.load_document(input=abstract, language='en')
             extractor.candidate_selection()
             extractor.candidate_weighting(df=self.df, model_file=self.kea_file)
-            keywords = extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
+            keywords = extract_all_candidates_from_pke_extractor(extractor) #extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
             entities.append(keywords)
         
         return entities
@@ -181,7 +229,7 @@ class pke_KPMiner(BaseModel):
             extractor.load_document(input=abstract, language='en')
             extractor.candidate_selection()
             extractor.candidate_weighting(df=self.df)
-            keywords = extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
+            keywords = extract_all_candidates_from_pke_extractor(extractor) #extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
             entities.append(keywords)
         
         return entities
@@ -211,7 +259,7 @@ class pke_TfIdf(BaseModel):
             extractor.load_document(input=abstract, language='en')
             extractor.candidate_selection()
             extractor.candidate_weighting(df=self.df)
-            keywords = extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
+            keywords = extract_all_candidates_from_pke_extractor(extractor) #extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
             entities.append(keywords)
         
         return entities
@@ -231,7 +279,7 @@ class pke_YAKE(BaseModel):
             extractor.load_document(input=abstract, language='en')
             extractor.candidate_selection()
             extractor.candidate_weighting()
-            keywords = extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
+            keywords = extract_all_candidates_from_pke_extractor(extractor) #extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
             entities.append(keywords)
         
         return entities
@@ -251,7 +299,7 @@ class pke_TopicRank(BaseModel):
             extractor.load_document(input=abstract, language='en')
             extractor.candidate_selection()
             extractor.candidate_weighting()
-            keywords = extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
+            keywords = extract_all_candidates_from_pke_extractor(extractor) #extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
             entities.append(keywords)
         
         return entities
@@ -271,7 +319,7 @@ class pke_MultipartiteRank(BaseModel):
             extractor.load_document(input=abstract, language='en')
             extractor.candidate_selection()
             extractor.candidate_weighting()
-            keywords = extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
+            keywords = extract_all_candidates_from_pke_extractor(extractor) #extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
             entities.append(keywords)
         
         return entities
@@ -301,7 +349,7 @@ class pke_TopicalPageRank(BaseModel):
             extractor.load_document(input=abstract, language='en')
             extractor.candidate_selection()
             extractor.candidate_weighting(lda_model=self.lda_model)
-            keywords = extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
+            keywords = extract_all_candidates_from_pke_extractor(extractor) #extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
             entities.append(keywords)
         
         return entities
@@ -321,7 +369,7 @@ class pke_PositionRank(BaseModel):
             extractor.load_document(input=abstract, language='en')
             extractor.candidate_selection()
             extractor.candidate_weighting()
-            keywords = extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
+            keywords = extract_all_candidates_from_pke_extractor(extractor) #extractor.get_n_best(n=20, stemming=False)  # Set a very high number to get all keywords
             entities.append(keywords)
         
         return entities

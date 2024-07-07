@@ -22,7 +22,6 @@ def prepare_prompt(prompt : Union[str, List], predictionDocument : str, training
         chat_history = []
         for p in prompt:
             chat_history.extend(p.get_chat_prompts(replacement_dict))
-        print(chat_history)
         return tokenizer.apply_chat_template(chat_history, tokenize=False, add_generation_prompt=True)
     else:
         logger.error("Invalid prompt type: {}".format(type(prompt)))
