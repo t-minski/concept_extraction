@@ -1,0 +1,117 @@
+from jinja2 import Template
+from typing import Union, List, Tuple
+import logging
+
+logger = logging.getLogger(__name__)
+
+def prepare_prompt(prompt : Union[str, List], predictionDocument : str, trainingData : List[Tuple[str, List[str]]], tokenizer):
+    replacement_dict = {
+        'predictionDocument': predictionDocument,
+        'trainingData': trainingData,
+        **tokenizer.special_tokens_map, # for bos_token and eos_token
+    }
+
+    # check for predefined prompts
+    if isinstance(prompt, str) and prompt in PREDEFINED_PROMPTS:
+        prompt = PREDEFINED_PROMPTS[prompt]
+
+    # process the prompt
+    if isinstance(prompt, str):
+        return Template(prompt).render(replacement_dict)
+    elif isinstance(prompt, list):
+        chat_history = []
+        for p in prompt:
+            chat_history.extend(p.get_chat_prompts(replacement_dict))
+        print(chat_history)
+        return tokenizer.apply_chat_template(chat_history, tokenize=False, add_generation_prompt=True)
+    else:
+        logger.error("Invalid prompt type: {}".format(type(prompt)))
+        return ""
+
+
+class ChatPrompt:
+    def __init__(self):
+        pass
+
+    def get_chat_prompts(self, replaceDict) -> List[Tuple[str, str]]:
+        pass
+
+class UserPrompt(ChatPrompt):
+    def __init__(self, prompt : str):
+        self.prompt = prompt
+
+    def get_chat_prompts(self, replaceDict) -> List[Tuple[str, str]]:
+        renderedPrompt = Template(self.prompt).render(replaceDict)
+        return [{"role":"user", "content": renderedPrompt}]
+    
+class SystemPrompt(ChatPrompt):
+    def __init__(self, prompt : str):
+        self.prompt = prompt
+
+    def get_chat_prompts(self, replaceDict) -> List[Tuple[str, str]]:
+        renderedPrompt = Template(self.prompt).render(replaceDict)
+        return [{"role":"system", "content": renderedPrompt}]
+    
+class AssistantPrompt(ChatPrompt):
+    def __init__(self, prompt : str):
+        self.prompt = prompt
+
+    def get_chat_prompts(self, replaceDict) -> List[Tuple[str, str]]:
+        renderedPrompt = Template(self.prompt).render(replaceDict)
+        return [{"role":"assistant", "content": renderedPrompt}]
+
+
+class FewShotPrompt(ChatPrompt):
+    def __init__(self, example_prompt : List[ChatPrompt]):
+        self.example_prompt = example_prompt
+
+    def get_chat_prompts(self, replaceDict) -> List[Tuple[str, str]]:
+        trainingData = replaceDict['trainingData']
+
+        return_list = []
+        for doc, keywords in trainingData:
+            new_replace_dict = replaceDict.copy()
+            new_replace_dict['document'] = doc
+            new_replace_dict['keywords'] = keywords
+            for example in self.example_prompt:
+                return_list.extend(example.get_chat_prompts(new_replace_dict))        
+        return return_list
+
+
+def get_default_user_prompt(documentType : str, meta_keyword : str) -> str:
+    return """I have the following document:
+{{"""+ documentType + """}}
+
+Please give me the """ + meta_keyword + """ that are present in this document and separate them with commas:
+"""
+
+
+PREDEFINED_PROMPTS = {}
+
+for key in ["keywords", "keyphrases", "concepts", "classes", "entities", "topics"]:
+    PREDEFINED_PROMPTS["simple_" + key] = [
+        UserPrompt(get_default_user_prompt("predictionDocument", key))
+    ]
+
+
+PREDEFINED_PROMPTS["fewshot_keyword"] = [
+        FewShotPrompt(
+            example_prompt = [
+                UserPrompt(get_default_user_prompt("document", "keywords")),
+                AssistantPrompt("{{keywords|join(',')}}")
+            ]
+        ),
+        UserPrompt(get_default_user_prompt("predictionDocument", "keywords"))
+]
+
+
+#z = [
+#    SystemPrompt("Hello, how can I help you?"),
+#    FewShotPrompt(
+#        example_prompt = [
+#            UserPrompt("Given the following document: [document] What are the keywords:"),
+#            AssistantPrompt("[keywords]")
+#        ]
+#    ),
+#    UserPrompt("Given the following document: [predictionDocument] What are the keywords:"),
+#]

@@ -1,6 +1,6 @@
-from data.base_dataset import BaseDataset
+from conexion.data.base_dataset import BaseDataset
+from conexion.data.statistics_logger import log_statistics
 from typing import List, Tuple
-from data.statistics_logger import log_statistics
 from datasets import load_dataset
 
 class kp20k(BaseDataset):                
