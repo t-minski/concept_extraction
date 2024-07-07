@@ -1,5 +1,5 @@
 from pyate import combo_basic, basic, cvalues
-from models.base_model import BaseModel
+from conexion.models.base_model import BaseModel
 from typing import List, Tuple
 
 class PyateBasicsEntities(BaseModel):

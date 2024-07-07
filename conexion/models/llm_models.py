@@ -5,7 +5,7 @@ from ctransformers import AutoModelForCausalLM as CAutoModelForCausalLM
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import torch
 from torch import cuda
-from models.base_model import BaseModel
+from conexion.models.base_model import BaseModel
 from typing import List, Tuple
 from keybert.llm import TextGeneration
 from huggingface_hub import login

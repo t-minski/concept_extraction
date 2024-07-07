@@ -1,6 +1,6 @@
 import argparse
 import logging
-from evaluation.evaluator import evaluate
+from conexion.evaluation.evaluator import evaluate
 import importlib
 from typing import List
 import os
@@ -39,40 +39,40 @@ def setup_parser() -> argparse.ArgumentParser:
 
 
 models_map = {
-    "SpacyEntities": ("models.spacy_models", "SpacyEntities"),
-    "SpacyNounChunks": ("models.spacy_models", "SpacyNounChunks"),
-    "TfIdfEntities": ("models.tfidf_models", "TfIdfEntities"),
-    "YakeEntities": ("models.yake_models", "YakeEntities"),
-    "SummaEntities": ("models.summa_models", "SummaEntities"),
-    "RakeEntities": ("models.rake_models", "RakeEntities"),
-    "PyateBasicsEntities": ("models.pyate_models", "PyateBasicsEntities"),
-    "PyateComboBasicEntities": ("models.pyate_models", "PyateComboBasicEntities"),
-    "PyateCvaluesEntities": ("models.pyate_models", "PyateCvaluesEntities"),
-    "LSAEntities": ("models.lsa_models", "LSAEntities"),
-    "LDAEntities": ("models.lda_models", "LDAEntities"),
+    "SpacyEntities": ("conexion.models.spacy_models", "SpacyEntities"),
+    "SpacyNounChunks": ("conexion.models.spacy_models", "SpacyNounChunks"),
+    "TfIdfEntities": ("conexion.models.tfidf_models", "TfIdfEntities"),
+    "YakeEntities": ("conexion.models.yake_models", "YakeEntities"),
+    "SummaEntities": ("conexion.models.summa_models", "SummaEntities"),
+    "RakeEntities": ("conexion.models.rake_models", "RakeEntities"),
+    "PyateBasicsEntities": ("conexion.models.pyate_models", "PyateBasicsEntities"),
+    "PyateComboBasicEntities": ("conexion.models.pyate_models", "PyateComboBasicEntities"),
+    "PyateCvaluesEntities": ("conexion.models.pyate_models", "PyateCvaluesEntities"),
+    "LSAEntities": ("conexion.models.lsa_models", "LSAEntities"),
+    "LDAEntities": ("conexion.models.lda_models", "LDAEntities"),
     
-    "pke_FirstPhrases": ("models.pke_models", "pke_FirstPhrases"),
-    "pke_TextRank": ("models.pke_models", "pke_TextRank"),
-    "pke_SingleRank": ("models.pke_models", "pke_SingleRank"),
-    "pke_TopicRank": ("models.pke_models", "pke_TopicRank"),
-    "pke_MultipartiteRank": ("models.pke_models", "pke_MultipartiteRank"),
-    "pke_TfIdf": ("models.pke_models", "pke_TfIdf"),
-    "pke_TopicalPageRank": ("models.pke_models", "pke_TopicalPageRank"),
-    "pke_YAKE": ("models.pke_models", "pke_YAKE"),
-    "pke_KPMiner": ("models.pke_models", "pke_KPMiner"),
-    "pke_Kea": ("models.pke_models", "pke_Kea"),
+    "pke_FirstPhrases": ("conexion.models.pke_models", "pke_FirstPhrases"),
+    "pke_TextRank": ("conexion.models.pke_models", "pke_TextRank"),
+    "pke_SingleRank": ("conexion.models.pke_models", "pke_SingleRank"),
+    "pke_TopicRank": ("conexion.models.pke_models", "pke_TopicRank"),
+    "pke_MultipartiteRank": ("conexion.models.pke_models", "pke_MultipartiteRank"),
+    "pke_TfIdf": ("conexion.models.pke_models", "pke_TfIdf"),
+    "pke_TopicalPageRank": ("conexion.models.pke_models", "pke_TopicalPageRank"),
+    "pke_YAKE": ("conexion.models.pke_models", "pke_YAKE"),
+    "pke_KPMiner": ("conexion.models.pke_models", "pke_KPMiner"),
+    "pke_Kea": ("conexion.models.pke_models", "pke_Kea"),
     
-    "EmbedRank": ("models.EmbedRank_models", "EmbedRank"),
-    "KeyBERTEntities": ("models.llm_models", "KeyBERTEntities"),
-    "Llama2_7b_Entities": ("models.llm_models", "Llama2_7b_Entities"),
-    "Llama2_70b_Entities": ("models.llm_models", "Llama2_70b_Entities"),
-    "Llama3_8b_Entities": ("models.llm_models", "Llama3_8b_Entities"),
-    "Llama3_70b_Entities": ("models.llm_models", "Llama3_70b_Entities"),
-    "Mistral_7b_Entities": ("models.llm_models", "Mistral_7b_Entities"),
-    "Mixtral_7b_Entities": ("models.llm_models", "Mixtral_7b_Entities"),
-    "Mixtral_22b_Entities": ("models.llm_models", "Mixtral_22b_Entities"),
-    "AdvancedConceptExtractor": ("models.conex_models", "AdvancedConceptExtractor"),
-    "GPTEntities": ("models.llm_models", "GPTEntities"),
+    "EmbedRank": ("conexion.models.EmbedRank_models", "EmbedRank"),
+    "KeyBERTEntities": ("conexion.models.llm_models", "KeyBERTEntities"),
+    "Llama2_7b_Entities": ("conexion.models.llm_models", "Llama2_7b_Entities"),
+    "Llama2_70b_Entities": ("conexion.models.llm_models", "Llama2_70b_Entities"),
+    "Llama3_8b_Entities": ("conexion.models.llm_models", "Llama3_8b_Entities"),
+    "Llama3_70b_Entities": ("conexion.models.llm_models", "Llama3_70b_Entities"),
+    "Mistral_7b_Entities": ("conexion.models.llm_models", "Mistral_7b_Entities"),
+    "Mixtral_7b_Entities": ("conexion.models.llm_models", "Mixtral_7b_Entities"),
+    "Mixtral_22b_Entities": ("conexion.models.llm_models", "Mixtral_22b_Entities"),
+    "AdvancedConceptExtractor": ("conexion.models.conex_models", "AdvancedConceptExtractor"),
+    "GPTEntities": ("conexion.models.llm_models", "GPTEntities"),
 }
 
 def get_models(model_texts: List[str], template_name: str) -> List:
@@ -91,10 +91,10 @@ def get_models(model_texts: List[str], template_name: str) -> List:
     return models
 
 dataset_map = {
-    "inspec": ("data.inspec_dataset", "inspec"),
-    "kp20k": ("data.kp20k_dataset", "kp20k"),
-    "semeval2010": ("data.semeval2010_dataset", "semeval2010"),
-    "semeval2017": ("data.semeval2017_dataset", "semeval2017"),
+    "inspec": ("conexion.data.inspec_dataset", "inspec"),
+    "kp20k": ("conexion.data.kp20k_dataset", "kp20k"),
+    "semeval2010": ("conexion.data.semeval2010_dataset", "semeval2010"),
+    "semeval2017": ("conexion.data.semeval2017_dataset", "semeval2017"),
 }
 
 def get_datasets(dataset_texts: List[str]) -> List:

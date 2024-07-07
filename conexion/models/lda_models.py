@@ -3,7 +3,7 @@ from gensim.corpora import Dictionary
 from gensim.parsing.preprocessing import preprocess_string, STOPWORDS
 from sklearn.metrics import precision_recall_fscore_support
 from itertools import product
-from models.base_model import BaseModel
+from conexion.models.base_model import BaseModel
 from typing import List, Tuple
 
 # Set up the logger

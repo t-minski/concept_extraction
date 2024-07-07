@@ -1,5 +1,5 @@
 from summa import keywords as summa_keywords
-from models.base_model import BaseModel
+from conexion.models.base_model import BaseModel
 from typing import List, Tuple
 
 class SummaEntities(BaseModel):

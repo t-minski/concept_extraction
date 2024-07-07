@@ -5,13 +5,13 @@ from ctransformers import AutoModelForCausalLM as CAutoModelForCausalLM
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import torch
 from torch import cuda
-from models.base_model import BaseModel
 from typing import List, Tuple
 from keybert.llm import TextGeneration
 from huggingface_hub import login
-from models.prompts import templates
-from models.llm_models import Llama2_70b_Entities
-from models.pke_models import pke_TextRank
+from conexion.models.base_model import BaseModel
+from conexion.models.prompts import templates
+from conexion.models.llm_models import Llama2_70b_Entities
+from conexion.models.pke_models import pke_TextRank
 
 login("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")
 

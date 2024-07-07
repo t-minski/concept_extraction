@@ -1,5 +1,5 @@
 import pke
-from models.base_model import BaseModel
+from conexion.models.base_model import BaseModel
 from typing import List, Tuple
 from pke import compute_document_frequency, compute_lda_model
 from string import punctuation

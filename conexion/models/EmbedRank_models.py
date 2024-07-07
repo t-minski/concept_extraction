@@ -1,6 +1,6 @@
 import spacy
 from spacycake import BertKeyphraseExtraction as bake
-from models.base_model import BaseModel
+from conexion.models.base_model import BaseModel
 from typing import List, Tuple
 
 class EmbedRank(BaseModel):
