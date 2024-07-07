@@ -4,7 +4,38 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def prepare_prompt(prompt : Union[str, List], predictionDocument : str, trainingData : List[Tuple[str, List[str]]], tokenizer):
+def get_prepared_prompt_as_chat(prompt : Union[str, List], predictionDocument : str, trainingData : List[Tuple[str, List[str]]]) -> List[Tuple]:
+    """This function is just for models which only accept chat prompts. It will return a list of tuples where each tuple contains the role and the content of the prompt.
+    Better use get_prepared_prompt_as_text for models which accept text prompts."""
+    replacement_dict = {
+        'predictionDocument': predictionDocument,
+        'trainingData': trainingData,
+        'bos_token': '',
+        'eos_token': '',
+        'unk_token': ''
+    }
+
+    # check for predefined prompts
+    if isinstance(prompt, str) and prompt in PREDEFINED_PROMPTS:
+        prompt = PREDEFINED_PROMPTS[prompt]
+
+    # process the prompt
+    chat_history = []
+    if isinstance(prompt, str):
+        preprocessed_template = Template(prompt).render(replacement_dict)
+        chat_history.append({"role":"user", "content": preprocessed_template})
+        return chat_history
+    elif isinstance(prompt, list):
+        chat_history = []
+        for p in prompt:
+            chat_history.extend(p.get_chat_prompts(replacement_dict))
+        return chat_history
+    else:
+        logger.error("Invalid prompt type: {}".format(type(prompt)))
+        return ""
+
+
+def get_prepared_prompt_as_text(prompt : Union[str, List], predictionDocument : str, trainingData : List[Tuple[str, List[str]]], tokenizer) -> str:
     replacement_dict = {
         'predictionDocument': predictionDocument,
         'trainingData': trainingData,
