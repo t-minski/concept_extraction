@@ -15,9 +15,7 @@ def analyze_datasets(datasets: List[str]):
     
     for dataset in get_datasets(datasets):
         training_abstracts, training_concepts = dataset.get_training_data()
-        test_abstracts, test_concepts = dataset.get_test_data()
-
-
+        # TODO: check if training_abstracts and training_concepts are correctly used or if we can remove this file completely
 
         filtered_documents = []
         filtered_keyphrases = []
@@ -27,7 +25,7 @@ def analyze_datasets(datasets: List[str]):
         filtered_keyphrases_per_document = []
         unfiltered_keyphrases_per_document = []
 
-        total_documents = len(documents)
+        total_documents = len(training_abstracts)
         total_documents_with_no_keyphrases = 0
         total_keyphrases = 0
         total_filtered_keyphrases = 0
@@ -36,7 +34,7 @@ def analyze_datasets(datasets: List[str]):
         total_named_entity_keyphrases = 0
         total_noun_phrase_keyphrases = 0
         
-        for tokens, keyphrases in zip(documents, extractive_keyphrases):        
+        for tokens, keyphrases in zip(training_abstracts, training_concepts):        
             document_text = ' '.join(tokens)
             filtered_phrases = [phrase for phrase in keyphrases if phrase in document_text]
             unfiltered_phrases = [phrase for phrase in keyphrases if phrase not in document_text]
