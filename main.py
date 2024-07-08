@@ -1,11 +1,12 @@
 import argparse
 import logging
-from conexion.evaluation.evaluator import evaluate
+from conexion.evaluation.evaluator import evaluate, evaluate_transfer_learning
 from conexion.data import get_datasets
 from conexion.models import get_models
 from typing import List
 import os
 import sys
+import random
 
 def dir_path(string):
     if os.path.isdir(string):
@@ -21,7 +22,11 @@ def setup_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "--datasets", "-d", nargs='+', help="Name of datasets e.g. `inspec`"
+        "--traindatasets", "-t", nargs='+', help="Name of datasets for training e.g. `inspec`. If provided, the length needs to be the same as the testing data e.g. --datasets. This option can be used to test transfer learning."
+    )
+
+    parser.add_argument(
+        "--datasets", "-d", nargs='+', help="Name of datasets for testing e.g. `inspec`", required=True
     )
 
     parser.add_argument(
@@ -50,6 +55,14 @@ def parse_eval_args(parser: argparse.ArgumentParser, cmd_arguments: List[str]) -
     if args.gpu:
         os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 
+    # setting random seeds
+    seed = 42
+    random.seed(seed)
+    import numpy as np 
+    np.random.seed(seed) # importing here because of cuda visible devices set before
+    import torch
+    torch.manual_seed(seed)
+
     return args
 
 
@@ -65,8 +78,15 @@ def cli_evaluate() -> None:
     parser = setup_parser()
     args = parse_eval_args(parser, cmd_arguments)
     models = get_models(args.models)
-    datasets = get_datasets(args.datasets)
-    evaluate(models, datasets, args.output)
+    test_datasets = get_datasets(args.datasets)
+
+    if not args.traindatasets:
+        evaluate(models, test_datasets, args.output)
+    else:
+        train_datasets = get_datasets(args.traindatasets)
+        assert len(train_datasets) == len(test_datasets), "The length of the training datasets needs to be the same as the testing datasets."
+        train_and_test_datasets = list(zip(train_datasets, test_datasets))
+        evaluate_transfer_learning(models, train_and_test_datasets, args.output)
 
 if __name__ == "__main__":
     cli_evaluate()
