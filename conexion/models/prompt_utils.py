@@ -125,13 +125,13 @@ for key in ["keywords", "keyphrases", "concepts", "classes", "entities", "topics
 
 
 PREDEFINED_PROMPTS["fewshot_keyword"] = [
-        FewShotPrompt(
-            example_prompt = [
-                UserPrompt(get_default_user_prompt("document", "keywords")),
-                AssistantPrompt("{{keywords|join(',')}}")
-            ]
-        ),
-        UserPrompt(get_default_user_prompt("predictionDocument", "keywords"))
+    FewShotPrompt(
+        example_prompt = [
+            UserPrompt(get_default_user_prompt("document", "keywords")),
+            AssistantPrompt("{{keywords|join(',')}}")
+        ]
+    ),
+    UserPrompt(get_default_user_prompt("predictionDocument", "keywords"))
 ]
 
 
@@ -139,9 +139,9 @@ PREDEFINED_PROMPTS["fewshot_keyword"] = [
 #    SystemPrompt("Hello, how can I help you?"),
 #    FewShotPrompt(
 #        example_prompt = [
-#            UserPrompt("Given the following document: [document] What are the keywords:"),
-#            AssistantPrompt("[keywords]")
+#            UserPrompt("Given the following document: {{document}} What are the keywords:"),
+#            AssistantPrompt("{{keywords|join(',')}}")
 #        ]
 #    ),
-#    UserPrompt("Given the following document: [predictionDocument] What are the keywords:"),
+#    UserPrompt("Given the following document: {{predictionDocument}} What are the keywords:"),
 #]

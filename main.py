@@ -5,6 +5,7 @@ from conexion.data import get_datasets
 from conexion.models import get_models
 from typing import List
 import os
+import sys
 
 def dir_path(string):
     if os.path.isdir(string):
@@ -28,7 +29,7 @@ def setup_parser() -> argparse.ArgumentParser:
     )
     
     parser.add_argument(
-        "--template", "-t", help="Name of the template to use e.g. `template_1`", default="template_1"
+        "--gpu", "-g", help="The GPUs to use (will be passed to CUDA_VISIBLE_DEVICES) e.g. `0,1` or '0'"
     )
 
     parser.add_argument("-v", "--verbose", help="increase output verbosity",
@@ -36,32 +37,36 @@ def setup_parser() -> argparse.ArgumentParser:
 
     return parser
 
-def setup_logging(verbose: bool) -> None:
+def parse_eval_args(parser: argparse.ArgumentParser, cmd_arguments: List[str]) -> argparse.Namespace:
+    args = parser.parse_args(args=cmd_arguments)
+
     log_format = "%(asctime)s %(levelname)s %(message)s"
 
-    if verbose:
+    if args.verbose:
         logging.basicConfig(level=logging.DEBUG, format=log_format)
     else:
         logging.basicConfig(level=logging.INFO, format=log_format)
+    
+    if args.gpu:
+        os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
+
+    return args
 
 
 def cli_evaluate() -> None:
-    with_parser = False
+    cmd_arguments = sys.argv[1:]
+    #cmd_arguments = [
+    #    "-m", "class=LLMBaseModel,model_name=meta-llama/Llama-2-7b-chat-hf,prompt=simple_keywords,with_confidence=False,batched_generation=True", 
+    #    "-d", "inspec", 
+    #    "-o", "./output",
+    #    "-g", "1"
+    #]
 
-    if with_parser:
-        parser = setup_parser()
-        args = parser.parse_args()
-        setup_logging(args.verbose)
-        models = get_models(args.models, args.template)
-        datasets = get_datasets(args.datasets)
-        evaluate(models, datasets, args.output)
-    else:
-        # testing / debugging
-        setup_logging(False)
-        models = get_models(['SpacyEntities'], "template_name")
-        datasets = get_datasets(['inspec'])
-        evaluate(models, datasets, './output')
-    
+    parser = setup_parser()
+    args = parse_eval_args(parser, cmd_arguments)
+    models = get_models(args.models)
+    datasets = get_datasets(args.datasets)
+    evaluate(models, datasets, args.output)
 
 if __name__ == "__main__":
     cli_evaluate()

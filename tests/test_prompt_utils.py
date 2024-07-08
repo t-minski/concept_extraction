@@ -13,7 +13,7 @@ Give me all the keywords that are present in this document and separate them wit
 {{bos_token}}I have the following document:
 {{predictionDocument}}
 
-Give me all the {{keywords}} that are present in this document and separate them with commas.
+Give me all the keywords that are present in this document and separate them with commas.
 """
 
 
