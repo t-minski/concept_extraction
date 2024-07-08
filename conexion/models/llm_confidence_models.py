@@ -2,7 +2,7 @@ from conexion.models.base_model import BaseModel
 from conexion.models.prompt_utils import get_prepared_prompt_as_text
 from typing import List, Tuple, Union
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, util
 import random # TODO: set seed in main for all random functions
 import logging
 import torch
@@ -65,7 +65,9 @@ class LLMBaseModel(BaseModel):
         tokenizer.pad_token = tokenizer.eos_token  # Most LLMs don't have a pad token by default
 
         # prepare the prompts
-        prepared_prompts = [get_prepared_prompt_as_text(self.prompt, abstract, [], tokenizer) for abstract in abstracts]
+        training_data = self.compute_all_training_data(abstracts)
+        assert len(abstracts) == len(training_data), "The length of the abstracts and the training data needs to be the same."
+        prepared_prompts = [get_prepared_prompt_as_text(self.prompt, abstract, training, tokenizer) for abstract, training in zip(abstracts, training_data)]
         model_inputs = tokenizer(prepared_prompts, padding=True, return_tensors="pt")
         model_inputs.to(model.device)
 
@@ -106,9 +108,11 @@ class LLMBaseModel(BaseModel):
             self.model_name,
             device_map="auto"
         )
+        training_data = self.compute_all_training_data(abstracts)
+        assert len(abstracts) == len(training_data), "The length of the abstracts and the training data needs to be the same."
         result = []
-        for abstract in abstracts:
-            prepared_prompt = get_prepared_prompt_as_text(self.prompt, abstract, [], tokenizer)
+        for abstract, training in zip(abstracts, training_data):
+            prepared_prompt = get_prepared_prompt_as_text(self.prompt, abstract, training, tokenizer)
             model_inputs = tokenizer(prepared_prompt, return_tensors="pt")
             model_inputs.to(model.device)
 
@@ -189,7 +193,7 @@ class LLMRandomButFixedTraining(LLMBaseModel):
         self.number_of_examples = number_of_examples
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
-        self.training_data = zip(abstracts, keyphrases)[:self.number_of_examples]
+        self.training_data = list(zip(abstracts, keyphrases))[:self.number_of_examples]
 
     def compute_one_training_data(self, prediction_abstract : str) -> List[Tuple[str, List[str]]]:
         return self.training_data
@@ -209,7 +213,7 @@ class LLMRandomTraining(LLMBaseModel):
         self.number_of_examples = number_of_examples
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
-        self.training_data = zip(abstracts, keyphrases)
+        self.training_data = list(zip(abstracts, keyphrases))
 
     def compute_one_training_data(self, prediction_abstract : str) -> List[Tuple[str, List[str]]]:
         return random.sample(self.training_data, self.number_of_examples)
@@ -230,9 +234,17 @@ class LLMClosestTraining(LLMBaseModel):
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
         # embed the corpus
-        self.embedded_abstracts = self.embedder.encode(abstracts, convert_to_tensor=True)
-    
+        self.training_data = list(zip(abstracts, keyphrases))
+        self.embedded_training_data = self.embedder.encode(abstracts, convert_to_tensor=True)
+        if torch.cuda.is_available():
+            corpus_embeddings = corpus_embeddings.to("cuda")
+        corpus_embeddings = util.normalize_embeddings(corpus_embeddings)
 
+    def compute_one_training_data(self, prediction_abstract : str) -> List[Tuple[str, List[str]]]:
+        raise Exception("Not implemented yet.")
+
+    def compute_all_training_data(self, prediction_abstracts : List[str]) -> List[List[Tuple[str, List[str]]]]:
+        raise Exception("Not implemented yet.")
 
 
 
