@@ -123,6 +123,10 @@ for key in ["keywords", "keyphrases", "concepts", "classes", "entities", "topics
         UserPrompt(get_default_user_prompt("predictionDocument", key))
     ]
 
+for key in ["keywords", "keyphrases", "concepts", "classes", "entities", "topics"]:
+    PREDEFINED_PROMPTS["simple_continuation_" + key] = """Given the following document: {{predictionDocument}}
+The """ + key + """ in this document are: """
+    
 
 PREDEFINED_PROMPTS["fewshot_keyword"] = [
     FewShotPrompt(
