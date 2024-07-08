@@ -48,7 +48,7 @@ class LLMBaseModel(BaseModel):
         pass
 
     def compute_one_training_data(self, prediction_abstract : str) -> List[Tuple[str, List[str]]]:
-        pass
+        return []
 
     def compute_all_training_data(self, prediction_abstracts : List[str]) -> List[List[Tuple[str, List[str]]]]:
         return [self.compute_one_training_data(prediction_abstract) for prediction_abstract in prediction_abstracts]
