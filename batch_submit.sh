@@ -38,7 +38,7 @@ do
     do
         for prompt in "${prompts[@]}"
         do
-			sbatch --job-name "${model}-${prompt}-${dataset}" run_job_2gpus.sh ${model} ${prompt} ${dataset}
+			sbatch --job-name "${model}-${prompt}-${dataset}" batch_job_2gpus.sh ${model} ${prompt} ${dataset}
         done
     done
 done
