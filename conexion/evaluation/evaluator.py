@@ -6,7 +6,10 @@ import time
 from sklearn.metrics import ndcg_score, average_precision_score
 from conexion.data.base_dataset import BaseDataset
 from conexion.models.base_model import BaseModel
+from nltk.stem import PorterStemmer
+import spacy
 
+nlp = spacy.load("en_core_web_sm")
 logger = logging.getLogger(__name__)
 
 
@@ -67,7 +70,7 @@ def evaluate_transfer_learning(models : List[BaseModel], datasets : List[Tuple[B
         training_abstracts, training_concepts = training_dataset.get_training_data()
         test_abstracts, test_concepts = test_dataset.get_test_data()
         for model in models:
-            type_model = model.__class__.__name__
+            type_model = getattr(model, "model_template_name", model.__class__.__name__)
 
             
             # Train the model
@@ -85,25 +88,58 @@ def evaluate_transfer_learning(models : List[BaseModel], datasets : List[Tuple[B
             logger.info(f"Run evaluation of model {type_model} on {type_dataset}")
             # Evaluate the predictions
             cumulative_precision, cumulative_recall, cumulative_f1_score = 0, 0, 0
+            stemmed_cumulative_precision, stemmed_cumulative_recall, stemmed_cumulative_f1_score = 0, 0, 0
+            
             cumulative_gt_keywords = 0
             cumulative_extracted_keywords = 0
+            
             cumulative_precision_5, cumulative_recall_5, cumulative_f1_score_5 = 0, 0, 0
+            stemmed_cumulative_precision_5, stemmed_cumulative_recall_5, cumulative_f1_score_5 = 0, 0, 0
+            
             cumulative_precision_10, cumulative_recall_10, cumulative_f1_score_10 = 0, 0, 0
+            stemmed_cumulative_precision_10, stemmed_cumulative_recall_10, stemmed_cumulative_f1_score_10 = 0, 0, 0
+            
             cumulative_precision_15, cumulative_recall_15, cumulative_f1_score_15 = 0, 0, 0
+            stemmed_cumulative_precision_15, stemmed_cumulative_recall_15, stemmed_cumulative_f1_score_15 = 0, 0, 0
 
             assert len(test_abstracts) == len(predicted_concepts_with_confidence)
             
-            with open(os.path.join(output_folder, f'evaluation_results_{type_model}_{type_dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
+            with open(os.path.join(output_folder, f'evaluation_results-{type_model}-{type_dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(['Ground_truth Keywords', 'Extracted Keywords', 'Precision', 'Recall', 'F1-score', 'n_gt_keywords', 'n_extraced_leywords',
-                                 'P@5', 'R@5', 'F@5', 'P@10', 'R@10', 'F@10', 'P@15', 'R@15', 'F@15', 'NDCG', 'MAP'])
-
+                                 'P@5', 'R@5', 'F@5', 'P@10', 'R@10', 'F@10', 'P@15', 'R@15', 'F@15', 'NDCG', 'MAP',
+                                 'stemmed_Precision', 'stemmed_Recall', 'stemmed_F1-score', 'stemmed_P@5', 'stemmed_R@5', 'stemmed_F@5', 'stemmed_P@10', 'stemmed_R@10', 'stemmed_F@10', 'stemmed_P@15', 'stemmed_R@15', 'stemmed_F@15', 'stemmed_NDCG', 'stemmed_MAP'
+                                 ])
                 # Calculate the precision, recall, and F1 score
                 for i, abstract in enumerate(test_abstracts):
                     only_keyword = [keyword for (keyword, confidence_score) in predicted_concepts_with_confidence[i]]
                     precision, recall, f1_score = evaluate_p_r_f(only_keyword, test_concepts[i])
                     prf_5, prf_10, prf_15, ndcg, map = evaluate_p_r_f_at_k(predicted_concepts_with_confidence[i], test_concepts[i])
                     
+                    # tokenization and stemming
+                    stemmed_only_keyword = [[" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase in sample] for sample in only_keyword ]
+                    stemmed_test = [[" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase in sample] for sample in test_concepts[i] ]
+                    stemmed_predicted_concepts_with_confidence = [[" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase in sample] for sample in predicted_concepts_with_confidence[i] ]
+                    stemmed_precision, stemmed_recall, stemmed_f1_score = evaluate_p_r_f(stemmed_only_keyword, stemmed_test)
+                    stemmed_prf_5, stemmed_prf_10, stemmed_prf_15, stemmed_ndcg, stemmed_map = evaluate_p_r_f_at_k(stemmed_predicted_concepts_with_confidence, stemmed_test)
+                    
+                    stemmed_cumulative_precision += stemmed_precision
+                    stemmed_cumulative_recall += stemmed_recall
+                    stemmed_cumulative_f1_score += stemmed_f1_score
+
+                    stemmed_cumulative_precision_5 += stemmed_prf_5[0]
+                    stemmed_cumulative_recall_5 += stemmed_prf_5[1]
+                    stemmed_cumulative_f1_score_5 += stemmed_prf_5[2]
+
+                    stemmed_cumulative_precision_10 += stemmed_prf_10[0]
+                    stemmed_cumulative_recall_10 += stemmed_prf_10[1]
+                    stemmed_cumulative_f1_score_10 += stemmed_prf_10[2]
+
+                    stemmed_cumulative_precision_15 += stemmed_prf_15[0]
+                    stemmed_cumulative_recall_15 += stemmed_prf_15[1]
+                    stemmed_cumulative_f1_score_15 += stemmed_prf_15[2]
+                    
+                    # not stemmed
                     cumulative_precision += precision
                     cumulative_recall += recall
                     cumulative_f1_score += f1_score
@@ -124,11 +160,27 @@ def evaluate_transfer_learning(models : List[BaseModel], datasets : List[Tuple[B
                     cumulative_extracted_keywords += len(only_keyword)
 
                     writer.writerow((test_concepts[i], only_keyword, precision, recall, f1_score, len(test_concepts[i]), len(only_keyword),
-                                     *prf_5, *prf_10, *prf_15, ndcg, map))
+                                     *prf_5, *prf_10, *prf_15, ndcg, map, stemmed_precision, stemmed_recall, stemmed_f1_score, *stemmed_prf_5, *stemmed_prf_10, *stemmed_prf_15, stemmed_ndcg, stemmed_map))
                     
 
+            stemmed_average_precision = stemmed_cumulative_precision / len(test_abstracts)
+            stemmed_average_recall = stemmed_cumulative_recall / len(test_abstracts)
+            stemmed_average_f1_score =  stemmed_cumulative_f1_score / len(test_abstracts)
 
-        
+            stemmed_average_precision_5 = stemmed_cumulative_precision_5 / len(test_abstracts)
+            stemmed_average_recall_5 = stemmed_cumulative_recall_5 / len(test_abstracts)
+            stemmed_average_f1_score_5 =  stemmed_cumulative_f1_score_5 / len(test_abstracts)
+
+            stemmed_average_precision_10 = stemmed_cumulative_precision_10 / len(test_abstracts)
+            stemmed_average_recall_10 = stemmed_cumulative_recall_10 / len(test_abstracts)
+            stemmed_average_f1_score_10 =  stemmed_cumulative_f1_score_10 / len(test_abstracts)
+
+            stemmed_average_precision_15 = stemmed_cumulative_precision_15 / len(test_abstracts)
+            stemmed_average_recall_15 = stemmed_cumulative_recall_15 / len(test_abstracts)
+            stemmed_average_f1_score_15 =  stemmed_cumulative_f1_score_15 / len(test_abstracts)
+
+            
+            # not stemmed
             average_precision = cumulative_precision / len(test_abstracts)
             average_recall = cumulative_recall / len(test_abstracts)
             average_f1_score =  cumulative_f1_score / len(test_abstracts)
@@ -150,13 +202,21 @@ def evaluate_transfer_learning(models : List[BaseModel], datasets : List[Tuple[B
 
             # Write ground truth keywords, extracted keywords, and evaluation results to CSV files
             
-            with open(os.path.join(output_folder, f'evaluation_results_avg_{type_model}_{type_dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
+            with open(os.path.join(output_folder, f'evaluation_results_avg-{type_model}-{type_dataset}.csv'), 'w', newline='', encoding='utf-8') as csvfile:
                 writer = csv.writer(csvfile)
-                writer.writerow(['Precision', 'Recall', 'F1-score', 'avg_n_gt_keywords', 'avg_n_extraced_leywords', 'P@5', 'R@5', 'F@5', 'P@10', 'R@10', 'F@10', 'P@15', 'R@15', 'F@15', 'NDCG', 'MAP', 'training seconds', 'prediction seconds'])
+                writer.writerow(['Precision', 'Recall', 'F1-score', 'avg_n_gt_keywords', 'avg_n_extraced_leywords',
+                                 'P@5', 'R@5', 'F@5', 'P@10', 'R@10', 'F@10', 'P@15', 'R@15', 'F@15', 'NDCG', 'MAP',
+                                 'stemmed_Precision', 'stemmed_Recall', 'stemmed_F1-score',
+                                 'stemmed_P@5', 'stemmed_R@5', 'stemmed_F@5', 'stemmed_P@10', 'stemmed_R@10', 'stemmed_F@10', 'stemmed_P@15', 'stemmed_R@15', 'stemmed_F@15', 'stemmed_NDCG', 'stemmed_MAP',
+                                 'training seconds', 'prediction seconds'])
                 writer.writerow([average_precision, average_recall, average_f1_score, average_gt_keywords, average_extracted_keywords,
                                  average_precision_5, average_recall_5, average_f1_score_5,
                                  average_precision_10, average_recall_10, average_f1_score_10,
                                  average_precision_15, average_recall_15, average_f1_score_15,
-                                 ndcg, map, training_time, prediction_time])
+                                 ndcg, map,
+                                 stemmed_average_precision, stemmed_average_recall, stemmed_average_f1_score, stemmed_average_precision_5, stemmed_average_recall_5, stemmed_average_f1_score_5,
+                                 stemmed_average_precision_10, stemmed_average_recall_10, stemmed_average_f1_score_10, stemmed_average_precision_15, stemmed_average_recall_15, stemmed_average_f1_score_15,
+                                 stemmed_ndcg, stemmed_map,
+                                 training_time, prediction_time])
             
             logger.info(f"Finished evaluation of model {type_model} on {type_dataset}")
