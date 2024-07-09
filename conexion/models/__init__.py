@@ -39,6 +39,9 @@ models_map = {
 
     # llm base
     "LLMBaseModel": ("conexion.models.llm_confidence_models", "LLMBaseModel", {}),
+    "LLMRandomButFixedTraining": ("conexion.models.llm_confidence_models", "LLMRandomButFixedTraining", {}),
+    "LLMRandomTraining": ("conexion.models.llm_confidence_models", "LLMRandomTraining", {}),
+    "LLMClosestTraining": ("conexion.models.llm_confidence_models", "LLMClosestTraining", {}),
 }
 
 
