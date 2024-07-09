@@ -4,6 +4,8 @@ from typing import List, Tuple
 import logging
 import time
 from sklearn.metrics import ndcg_score, average_precision_score
+from conexion.data.base_dataset import BaseDataset
+from conexion.models.base_model import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -52,13 +54,18 @@ def evaluate_p_r_f_at_k(keyphrases : List[Tuple[str, float]], references : List[
 
     return values
 
-def evaluate(models, datasets, output_folder):
+def evaluate(models: List[BaseModel], datasets: List[BaseDataset], output_folder: str):
+    evaluate_transfer_learning(models, [(dataset, dataset) for dataset in datasets], output_folder)
+
+def evaluate_transfer_learning(models : List[BaseModel], datasets : List[Tuple[BaseDataset, BaseDataset]], output_folder : str):
     # Evaluate the models on the datasets
-    for dataset in datasets:
-        type_dataset = dataset.__class__.__name__
+    for training_dataset, test_dataset in datasets:
+        type_training_dataset = training_dataset.__class__.__name__
+        type_test_dataset = test_dataset.__class__.__name__
+        type_dataset = f"{type_training_dataset}-{type_test_dataset}"
         
-        training_abstracts, training_concepts = dataset.get_training_data()
-        test_abstracts, test_concepts = dataset.get_test_data()
+        training_abstracts, training_concepts = training_dataset.get_training_data()
+        test_abstracts, test_concepts = test_dataset.get_test_data()
         for model in models:
             type_model = model.__class__.__name__
 
