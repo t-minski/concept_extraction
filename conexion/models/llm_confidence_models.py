@@ -238,14 +238,29 @@ class LLMClosestTraining(LLMBaseModel):
         self.training_data = list(zip(abstracts, keyphrases))
         self.embedded_training_data = self.embedder.encode(abstracts, convert_to_tensor=True)
         if torch.cuda.is_available():
-            corpus_embeddings = corpus_embeddings.to("cuda")
-        corpus_embeddings = util.normalize_embeddings(corpus_embeddings)
+            self.embedded_training_data = self.embedded_training_data.to("cuda")
+        self.embedded_training_data = util.normalize_embeddings(self.embedded_training_data)
 
     def compute_one_training_data(self, prediction_abstract : str) -> List[Tuple[str, List[str]]]:
-        raise Exception("Not implemented yet.")
-
+        embedded_query_data = self.embedder.encode(prediction_abstract, convert_to_tensor=True)
+        similarity_scores = self.embedder.similarity(embedded_query_data, self.embedded_training_data)[0]
+        scores, indices = torch.topk(similarity_scores, k=self.number_of_examples)
+        return [self.training_data[index] for index in indices]
+    
     def compute_all_training_data(self, prediction_abstracts : List[str]) -> List[List[Tuple[str, List[str]]]]:
-        raise Exception("Not implemented yet.")
+        embedded_query_data = self.embedder.encode(prediction_abstracts, convert_to_tensor=True)
+        if torch.cuda.is_available():
+            embedded_query_data = embedded_query_data.to("cuda")
+        embedded_query_data = util.normalize_embeddings(embedded_query_data)
+
+        hits = util.semantic_search(
+            embedded_query_data,
+            self.embedded_training_data,
+            top_k = self.number_of_examples,
+            score_function = util.dot_score
+        )
+
+        return [[self.training_data[hit['corpus_id']] for hit in hit_list] for hit_list in hits]
 
 
 

@@ -1,4 +1,4 @@
-from conexion.models.prompt_utils import prepare_prompt, SystemPrompt, UserPrompt, AssistantPrompt, FewShotPrompt
+from conexion.models.prompt_utils import get_prepared_prompt_as_text, SystemPrompt, UserPrompt, AssistantPrompt, FewShotPrompt
 from collections import namedtuple
 from transformers import AutoTokenizer
 
@@ -65,13 +65,13 @@ def test_non_chat():
     #MyTokenizer = namedtuple('MyTokenizer', ['bos_token', 'eos_token'])
     #tokenizer = MyTokenizer(bos_token="my_bos", eos_token="my_eos")
     
-    rendered_prompt = prepare_prompt(easy_non_chat_prompt, pred_doc , training_data, mytokenizer())
+    rendered_prompt = get_prepared_prompt_as_text(easy_non_chat_prompt, pred_doc , training_data, mytokenizer())
     assert(rendered_prompt == ground_truth_non_chat)
 
 
 def test_chat():
     tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
-    rendered_prompt = prepare_prompt(chat_prompt, pred_doc, training_data, tokenizer)
+    rendered_prompt = get_prepared_prompt_as_text(chat_prompt, pred_doc, training_data, tokenizer)
     print("===============================")
     print(rendered_prompt)
     print("===============================")
