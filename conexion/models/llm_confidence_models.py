@@ -43,7 +43,7 @@ class LLMBaseModel(BaseModel):
         self.with_confidence = with_confidence
         self.batched_generation = batched_generation
         self.extractive_keywords_only = extractive_keywords_only
-        self.model_template_name= prompt + model_name
+        self.model_template_name = 'LLMBaseModel-' + prompt + '-' + model_name[model_name.index('/'):]
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
         pass
