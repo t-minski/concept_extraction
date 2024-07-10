@@ -27,6 +27,7 @@ models_map = {
     
     "EmbedRank": ("conexion.models.EmbedRank_models", "EmbedRank", {}),
     "KeyBERTEntities": ("conexion.models.llm_models", "KeyBERTEntities", {}),
+    "MultiPax": ("conexion.models.llm_models", "MultiPax", {}),
     "Llama2_7b_Entities": ("conexion.models.llm_models", "Llama2_7b_Entities", {}),
     "Llama2_70b_Entities": ("conexion.models.llm_models", "Llama2_70b_Entities", {}),
     "Llama3_8b_Entities": ("conexion.models.llm_models", "Llama3_8b_Entities", {}),
