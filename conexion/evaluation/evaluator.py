@@ -94,7 +94,7 @@ def evaluate_transfer_learning(models : List[BaseModel], datasets : List[Tuple[B
             cumulative_extracted_keywords = 0
             
             cumulative_precision_5, cumulative_recall_5, cumulative_f1_score_5 = 0, 0, 0
-            stemmed_cumulative_precision_5, stemmed_cumulative_recall_5, cumulative_f1_score_5 = 0, 0, 0
+            stemmed_cumulative_precision_5, stemmed_cumulative_recall_5, stemmed_cumulative_f1_score_5 = 0, 0, 0
             
             cumulative_precision_10, cumulative_recall_10, cumulative_f1_score_10 = 0, 0, 0
             stemmed_cumulative_precision_10, stemmed_cumulative_recall_10, stemmed_cumulative_f1_score_10 = 0, 0, 0
@@ -117,9 +117,11 @@ def evaluate_transfer_learning(models : List[BaseModel], datasets : List[Tuple[B
                     prf_5, prf_10, prf_15, ndcg, map = evaluate_p_r_f_at_k(predicted_concepts_with_confidence[i], test_concepts[i])
                     
                     # tokenization and stemming
-                    stemmed_only_keyword = [[" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase in only_keyword ]]
-                    stemmed_test = [[" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase in test_concepts[i] ]]
-                    stemmed_predicted_concepts_with_confidence = [[" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase in predicted_concepts_with_confidence[i] ]]
+                    stemmed_only_keyword = [" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase in only_keyword ]
+                    stemmed_test = [" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase in test_concepts[i] ]
+                    stemmed_predicted_concepts_with_confidence = [" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase, confidence in predicted_concepts_with_confidence[i] ]
+                    stemmed_predicted_concepts_with_confidence = [(" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]), confidence) for keyphrase, confidence in predicted_concepts_with_confidence[i]]
+
                     stemmed_precision, stemmed_recall, stemmed_f1_score = evaluate_p_r_f(stemmed_only_keyword, stemmed_test)
                     stemmed_prf_5, stemmed_prf_10, stemmed_prf_15, stemmed_ndcg, stemmed_map = evaluate_p_r_f_at_k(stemmed_predicted_concepts_with_confidence, stemmed_test)
                     
