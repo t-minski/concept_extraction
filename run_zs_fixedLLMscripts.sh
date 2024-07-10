@@ -2,11 +2,11 @@
 
 # Define the models and datasets
 models=(
-    "meta-llama/Llama-2-7b-chat-hf"
+    # "meta-llama/Llama-2-7b-chat-hf"
     # "meta-llama/Llama-2-70b-chat-hf"
     # "meta-llama/Llama-2-13b-chat-hf"
 
-    # "meta-llama/Meta-Llama-3-8B-Instruct"
+    "meta-llama/Meta-Llama-3-8B-Instruct"
     # "meta-llama/Meta-Llama-3-70B-Instruct"
 
     # "mistralai/Mistral-7B-Instruct-v0.3"
@@ -32,9 +32,9 @@ mkdir -p ${log_folder}
 
 # Define templates
 templates=(
-    "zs_domain_keywords"
-    "zs_extracting_context"
-    "zs_expert_context"
+    "zs_domain_topics"
+    "zs_extracting_context_topics"
+    "zs_expert_context_topics"
     "zs_task_context"
 )
 
