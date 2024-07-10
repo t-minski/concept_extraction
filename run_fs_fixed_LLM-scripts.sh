@@ -2,11 +2,11 @@
 
 # Define the models and datasets
 models=(
-    "meta-llama/Llama-2-7b-chat-hf"
+    # "meta-llama/Llama-2-7b-chat-hf"
     # "meta-llama/Llama-2-70b-chat-hf"
     # "meta-llama/Llama-2-13b-chat-hf"
 
-    # "meta-llama/Meta-Llama-3-8B-Instruct"
+    "meta-llama/Meta-Llama-3-8B-Instruct"
     # "meta-llama/Meta-Llama-3-70B-Instruct"
 
     # "mistralai/Mistral-7B-Instruct-v0.3"
@@ -53,16 +53,16 @@ do
         do
             for number in "${numbers[@]}"
             do
-                log_file="${log_folder}/${model}_${dataset}_${template}_${number}.log"
+                log_file="${log_folder}/${model}-${class_models}_${dataset}_fs_topics${number}.log"
                 
-                echo "Running model ${model} on dataset ${dataset} with template ${template}_${number}, output will be logged to ${log_file}"
+                echo "Running model ${model}-${class_models} on dataset ${dataset} with template fewshot_keyword_${number}, output will be logged to ${log_file}"
                 
                 # Run the command and log the output, continue to next command even if there is an error
-                python3 main.py --models class=${class_model},prompt=fewshot_keyword,model_name=${model},number_of_examples=${number},with_confidence=False,batched_generation=False  --datasets ${dataset} --output ${output_folder} --gpu 1> ${log_file} 2>&1
+                python3 main.py --models class=${class_model},prompt=fs_topics,model_name=${model},number_of_examples=${number},with_confidence=False,batched_generation=False  --datasets ${dataset} --output ${output_folder} -gpu 1> ${log_file} 2>&1
                 if [ $? -ne 0 ]; then
-                    echo "Error encountered with model ${model} on dataset ${dataset} using template ${template}_${number}. Check ${log_file} for details."
+                    echo "Error encountered with model ${model}-${class_models} on dataset ${dataset} using template fewshot_keyword_${number}. Check ${log_file} for details."
                 else
-                    echo "Successfully completed model ${model} on dataset ${dataset} using template ${template}_${number}. Log saved to ${log_file}."
+                    echo "Successfully completed model ${model}-${class_models} on dataset ${dataset} using template fewshot_keyword_${number}. Log saved to ${log_file}."
                 fi
             done
         done
