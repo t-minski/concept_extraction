@@ -7,4 +7,4 @@
 source activate conexion
 
 log_file="./output/${1////*}_${3}_${2}.log"
-python main.py --models class=LLMBaseModel,prompt=${2},model_name=${1},with_confidence=False,batched_generation=False --datasets ${3} --output ./output -v > ${log_file} 2>&1
+python main.py --models class=LLMBaseModel,prompt=${2},model_name=${1},load_in_4bit=True --datasets ${3} --output ./output -v > ${log_file} 2>&1

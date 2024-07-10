@@ -1,18 +1,21 @@
 #!/bin/bash
 
 # Define the models and datasets
-models=(
+small_models=(
     "meta-llama/Llama-2-7b-chat-hf"
-    "meta-llama/Llama-2-70b-chat-hf"
     "meta-llama/Llama-2-13b-chat-hf"
-
     "meta-llama/Meta-Llama-3-8B-Instruct"
-    "meta-llama/Meta-Llama-3-70B-Instruct"
-
     "mistralai/Mistral-7B-Instruct-v0.3"
     "mistralai/Mixtral-8x7B-Instruct-v0.1"
+)
+medium_models=(
+    "meta-llama/Llama-2-70b-chat-hf"
+    "meta-llama/Meta-Llama-3-70B-Instruct"
+)
+large_models=(
     "mistralai/Mixtral-8x22B-v0.1"
 )
+
 
 datasets=(
     "inspec"
@@ -32,13 +35,25 @@ prompts=(
 )
 
 # Loop over each model and dataset combination
-for model in "${models[@]}"
+
+
+for dataset in "${datasets[@]}"
 do
-    for dataset in "${datasets[@]}"
-    do
-        for prompt in "${prompts[@]}"
-        do
-			sbatch --job-name "${model}-${prompt}-${dataset}" batch_job_2gpus.sh ${model} ${prompt} ${dataset}
-        done
-    done
+	for prompt in "${prompts[@]}"
+	do
+		for model in "${small_models[@]}"
+		do
+			sbatch --job-name "${model}-${prompt}-${dataset}" batch_job_1gpu.sh ${model} ${prompt} ${dataset}
+		done
+		
+		for model in "${medium_models[@]}"
+		do
+			sbatch --job-name "${model}-${prompt}-${dataset}" batch_job_2gpu.sh ${model} ${prompt} ${dataset}
+		done
+		
+		for model in "${large_models[@]}"
+		do
+			sbatch --job-name "${model}-${prompt}-${dataset}" batch_job_3gpu.sh ${model} ${prompt} ${dataset}
+		done
+	done
 done
