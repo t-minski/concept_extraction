@@ -286,6 +286,8 @@ class RestrictedLLMBasedGeneration(BaseModel):
         # https://huggingface.co/docs/text-generation-inference/conceptual/guidance
         # https://huggingface.co/docs/text-generation-inference/basic_tutorials/using_guidance
         # https://github.com/huggingface/text-generation-inference/blob/main/clients/python/text_generation/inference_api.py
+        # https://github.com/huggingface/text-generation-inference/blob/f5ba9bfd52c859852aed93fe2b54b7e1a7fc0bc9/server/text_generation_server/utils/logits_process.py#L483
+        
 
         # change the generate function
         # https://github.com/huggingface/transformers/blob/v4.18.0/src/transformers/generation_utils.py#L831
