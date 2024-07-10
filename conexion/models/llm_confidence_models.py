@@ -1,13 +1,13 @@
 from conexion.models.base_model import BaseModel
 from conexion.models.prompt_utils import get_prepared_prompt_as_text, get_prepared_prompt_as_chat
 from typing import List, Tuple, Union
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from sentence_transformers import SentenceTransformer, util
 import random # TODO: set seed in main for all random functions
 import logging
 import torch
 import re
-import openai
+import openai # TODO: move GPT to a seperate file (no need for depenedency if model is not used)
 import os
 
 SPIECE_UNDERLINE = "▁"
@@ -92,13 +92,31 @@ class LLMBaseModel(BaseModel):
             results.append([(keyword, 1.0) for keyword in keywords])
         
         return results
+    
+    def get_quantization_config(self) -> BitsAndBytesConfig:
+        if self.load_in_4bit:
+            return BitsAndBytesConfig(
+                load_in_4bit=True,  # 4-bit quantization
+                bnb_4bit_quant_type='nf4',  # Normalized float 4
+                #bnb_4bit_use_double_quant=True,  # Second quantization after the first
+                bnb_4bit_compute_dtype=torch.bfloat16  # Computation type
+            )
+        elif self.load_in_8bit:
+            return BitsAndBytesConfig(
+                load_in_8bit=True,  # 8-bit quantization
+                bnb_8bit_quant_type='dynamic',  # Dynamic quantization
+                bnb_8bit_use_double_quant=True,  # Second quantization after the first
+                bnb_8bit_compute_dtype=torch.bfloat16  # Computation type
+            )
+        else:
+            return None
         
     def batched_computation(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
         # https://huggingface.co/docs/transformers/llm_tutorial#wrong-padding-side
         tokenizer = AutoTokenizer.from_pretrained(self.model_name, padding_side="left") # padding side is important
         model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
-            load_in_4bit=self.load_in_4bit, load_in_8bit=self.load_in_8bit, # quantize the model
+            quantization_config=self.get_quantization_config(), # quantize the model
             device_map="auto"
         )
 
@@ -125,6 +143,7 @@ class LLMBaseModel(BaseModel):
             raise Exception("Not implemented yet.")
             outputs = model.generate(
                 input_ids=input_ids, attention_mask=attention_mask, # token and attention input
+                max_length=4096,  # maximum length of the output
                 num_beams=1, do_sample=False  # make it deterministic -> greedy decoding
             )
             generated_text = tokenizer.batch_decode(outputs, skip_special_tokens=True) # batch decode
@@ -146,7 +165,7 @@ class LLMBaseModel(BaseModel):
         tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
-            load_in_4bit=self.load_in_4bit, load_in_8bit=self.load_in_8bit, # quantize the model
+            quantization_config=self.get_quantization_config(), # quantize the model
             device_map="auto"
         )
         training_data = self.compute_all_training_data(abstracts)
@@ -167,6 +186,7 @@ class LLMBaseModel(BaseModel):
             if self.with_confidence:
                 outputs = model.generate(
                     input_ids=input_ids, attention_mask=attention_mask, # token and attention input
+                    max_length=4096,  # maximum length of the output
                     output_scores=True, return_dict_in_generate=True, # also return the scores
                     num_beams=1, do_sample=False  # make it deterministic -> greedy decoding
                 )
@@ -201,6 +221,7 @@ class LLMBaseModel(BaseModel):
             else:
                 outputs = model.generate(
                     input_ids=input_ids, attention_mask=attention_mask, # token and attention input
+                    max_length=4096,  # maximum length of the output
                     num_beams=1, do_sample=False  # make it deterministic -> greedy decoding
                 )
                 generated_text = tokenizer.decode(outputs[0][input_ids.shape[1]:], skip_special_tokens=True)
