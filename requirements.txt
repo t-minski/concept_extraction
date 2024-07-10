@@ -1,5 +1,6 @@
 spacy==3.7.5
 en_core_web_lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.7.1/en_core_web_lg-3.7.1-py3-none-any.whl
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
 pke @ git+https://github.com/boudinfl/pke@69871ff
 keybert==0.8.4
 yake @ git+https://github.com/LIAAD/yake@0fa58cc
@@ -10,3 +11,5 @@ transformers==4.41.2
 accelerate==0.31.0
 datasets==2.19.2
 lm_eval @ git+https://github.com/EleutherAI/lm-evaluation-harness@9088a68
+sentencepiece==0.2.0
+protobuf==5.27.2

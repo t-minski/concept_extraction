@@ -7,7 +7,7 @@ def combine_output_files(folder:str, output_file:str):
     Combines all the output files in the folder which fulfill the regex  into a single file
     """
     #precompile the regex
-    file_regex = re.compile("evaluation_results_avg_(.*)_(.*).csv")
+    file_regex = re.compile("evaluation_results_avg[-_](.*)[-_](.*).csv")
     is_first = True
     with open(output_file, "w") as out_file:
         for file in os.listdir(folder):

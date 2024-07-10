@@ -1,5 +1,5 @@
 from conexion.models.base_model import BaseModel
-from conexion.models.prompt_utils import get_prepared_prompt_as_text
+from conexion.models.prompt_utils import get_prepared_prompt_as_text, get_prepared_prompt_as_chat
 from typing import List, Tuple, Union
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from sentence_transformers import SentenceTransformer, util
@@ -7,6 +7,8 @@ import random # TODO: set seed in main for all random functions
 import logging
 import torch
 import re
+import openai
+import os
 
 SPIECE_UNDERLINE = "▁"
 logger = logging.getLogger(__name__)
@@ -28,7 +30,9 @@ class LLMBaseModel(BaseModel):
                  revision : str = "main", 
                  with_confidence: bool = False, 
                  batched_generation: bool = False,
-                 extractive_keywords_only: bool = True):
+                 extractive_keywords_only: bool = True,
+                 load_in_4bit: bool = False,
+                 load_in_8bit: bool = False):
         """
         Args:
             prompt (str): The prompt to be used for the model.
@@ -43,7 +47,9 @@ class LLMBaseModel(BaseModel):
         self.with_confidence = with_confidence
         self.batched_generation = batched_generation
         self.extractive_keywords_only = extractive_keywords_only
-        self.model_template_name = 'LLMBaseModel-' + prompt + '-' + model_name[model_name.index('/'):]
+        self.load_in_4bit = load_in_4bit
+        self.load_in_8bit = load_in_8bit
+        self.model_template_name = 'LLMBaseModel-' + prompt + '-' + model_name.rsplit('/', 1)[-1]
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
         pass
@@ -54,12 +60,45 @@ class LLMBaseModel(BaseModel):
     def compute_all_training_data(self, prediction_abstracts : List[str]) -> List[List[Tuple[str, List[str]]]]:
         return [self.compute_one_training_data(prediction_abstract) for prediction_abstract in prediction_abstracts]
 
-
+    def gpt_computation(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
+        training_data = self.compute_all_training_data(abstracts)
+        assert len(abstracts) == len(training_data), "The length of the abstracts and the training data needs to be the same."
+        results = []
+        for abstract, training in zip(abstracts, training_data):
+            prepared_prompt = get_prepared_prompt_as_chat(self.prompt, abstract, training)
+            if isinstance(prepared_prompt, str):
+                response = openai.Completion.create(
+                    engine=self.model_name,
+                    prompt=prepared_prompt,
+                    max_tokens=150,
+                    n=1,
+                    stop=None,
+                    temperature=0.7
+                )
+                keywords = split_keywords(response.choices[0].text.strip())
+            elif isinstance(prepared_prompt, list):
+                response = openai.ChatCompletion.create(
+                    model=self.model_name,
+                    messages=prepared_prompt,
+                    max_tokens=150,
+                    n=1,
+                    stop=None,
+                    temperature=0.7
+                )
+                keywords = split_keywords(response.choices[0].message['content'].strip())
+            else:
+                raise Exception("Wrong type for gpt.")
+            
+            results.append([(keyword, 1.0) for keyword in keywords])
+        
+        return results
+        
     def batched_computation(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
         # https://huggingface.co/docs/transformers/llm_tutorial#wrong-padding-side
         tokenizer = AutoTokenizer.from_pretrained(self.model_name, padding_side="left") # padding side is important
         model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
+            load_in_4bit=self.load_in_4bit, load_in_8bit=self.load_in_8bit, # quantize the model
             device_map="auto"
         )
 
@@ -107,6 +146,7 @@ class LLMBaseModel(BaseModel):
         tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
+            load_in_4bit=self.load_in_4bit, load_in_8bit=self.load_in_8bit, # quantize the model
             device_map="auto"
         )
         training_data = self.compute_all_training_data(abstracts)
@@ -169,7 +209,10 @@ class LLMBaseModel(BaseModel):
 
 
     def predict(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
-        result = self.batched_computation(abstracts) if self.batched_generation else self.non_batched_computation(abstracts)
+        if self.model_name == "gpt-3.5-turbo":
+            result = self.gpt_computation(abstracts)
+        else:
+            result = self.batched_computation(abstracts) if self.batched_generation else self.non_batched_computation(abstracts)
         if self.extractive_keywords_only:
             new_result = []
             for abstract, keywords in zip(abstracts, result):
@@ -299,9 +342,6 @@ class RestrictedLLMBasedGeneration(BaseModel):
         # TODO: implement
         
         return []
-
-
-
 
 
 

@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH --partition=single
+#SBATCH --partition=devel
 #SBATCH --ntasks=15
-#SBATCH --time=12:00:00
-#SBATCH --gres=gpu:A100:2
+#SBATCH --time=00:29:00
+#SBATCH --gres=gpu:A100:1
 
 source activate conexion
 

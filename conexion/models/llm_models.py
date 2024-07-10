@@ -160,6 +160,52 @@ class GPTEntities(BaseModel):
         return self.template_name
 
 
+class MultiPax(BaseModel):
+    
+    def __init__(self):
+        self.kw_model = KeyBERT()
+
+    def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
+        pass
+
+    def predict(self, abstracts: List[str]) -> List[List[str]]:        
+        # Extract keywords using KeyBERT entities
+        entities = []
+        for abstract in abstracts:
+            keywords = self.kw_model.extract_keywords([abstract], keyphrase_ngram_range=(1, 3), use_mmr=True, diversity=0.5,
+                                         stop_words='english', top_n=10)
+            keywords_with_scores = [
+                                    (keyword.rstrip('.'), score) 
+                                    for keyword, score in keywords 
+                                    if keyword.rstrip('.').lower() in abstract.lower()
+                                    ]
+            entities.append(keywords_with_scores)
+        
+        return entities
+
+class KeyBERTEntities(BaseModel):
+    
+    def __init__(self):
+        self.kw_model = KeyBERT()
+
+    def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
+        pass
+
+    def predict(self, abstracts: List[str]) -> List[List[str]]:        
+        # Extract keywords using KeyBERT entities
+        entities = []
+        for abstract in abstracts:
+            keywords = self.kw_model.extract_keywords([abstract], threshold=0.5)
+            keywords_with_scores = [
+                                    (keyword.rstrip('.'), score) 
+                                    for keyword, score in keywords 
+                                    if keyword.rstrip('.').lower() in abstract.lower()
+                                    ]
+            entities.append(keywords_with_scores)
+        
+        return entities
+
+
 class Llama2_7b_Entities(BaseModel):
     
     def __init__(self, template_name="template_1"):
