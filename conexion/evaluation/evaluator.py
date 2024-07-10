@@ -119,7 +119,6 @@ def evaluate_transfer_learning(models : List[BaseModel], datasets : List[Tuple[B
                     # tokenization and stemming
                     stemmed_only_keyword = [" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase in only_keyword ]
                     stemmed_test = [" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase in test_concepts[i] ]
-                    stemmed_predicted_concepts_with_confidence = [" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase, confidence in predicted_concepts_with_confidence[i] ]
                     stemmed_predicted_concepts_with_confidence = [(" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]), confidence) for keyphrase, confidence in predicted_concepts_with_confidence[i]]
 
                     stemmed_precision, stemmed_recall, stemmed_f1_score = evaluate_p_r_f(stemmed_only_keyword, stemmed_test)
