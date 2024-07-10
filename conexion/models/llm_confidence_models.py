@@ -30,7 +30,9 @@ class LLMBaseModel(BaseModel):
                  revision : str = "main", 
                  with_confidence: bool = False, 
                  batched_generation: bool = False,
-                 extractive_keywords_only: bool = True):
+                 extractive_keywords_only: bool = True,
+                 load_in_4bit: bool = False,
+                 load_in_8bit: bool = False):
         """
         Args:
             prompt (str): The prompt to be used for the model.
@@ -45,6 +47,8 @@ class LLMBaseModel(BaseModel):
         self.with_confidence = with_confidence
         self.batched_generation = batched_generation
         self.extractive_keywords_only = extractive_keywords_only
+        self.load_in_4bit = load_in_4bit
+        self.load_in_8bit = load_in_8bit
         self.model_template_name = 'LLMBaseModel-' + prompt + '-' + model_name.rsplit('/', 1)[-1]
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
@@ -94,6 +98,7 @@ class LLMBaseModel(BaseModel):
         tokenizer = AutoTokenizer.from_pretrained(self.model_name, padding_side="left") # padding side is important
         model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
+            load_in_4bit=self.load_in_4bit, load_in_8bit=self.load_in_8bit, # quantize the model
             device_map="auto"
         )
 
@@ -141,6 +146,7 @@ class LLMBaseModel(BaseModel):
         tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
+            load_in_4bit=self.load_in_4bit, load_in_8bit=self.load_in_8bit, # quantize the model
             device_map="auto"
         )
         training_data = self.compute_all_training_data(abstracts)
