@@ -115,6 +115,12 @@ def get_default_user_prompt(documentType : str, meta_keyword : str) -> str:
 Please give me the """ + meta_keyword + """ that are present in this document and separate them with commas:
 """
 
+def get_domain_user_prompt(documentType : str, meta_keyword : str) -> str:
+    return """I have the following document:
+{{"""+ documentType + """}}
+
+Please give me the """ + meta_keyword + """ related to the domains of Computer Science, Control, and Information Technology that are present in this document and separate them with commas:
+"""
 
 PREDEFINED_PROMPTS = {}
 
@@ -138,6 +144,29 @@ PREDEFINED_PROMPTS["fewshot_keyword"] = [
     UserPrompt(get_default_user_prompt("predictionDocument", "keywords"))
 ]
 
+# ZS + Domain 
+for key in ["keywords", "keyphrases", "concepts", "classes", "entities", "topics"]:
+    PREDEFINED_PROMPTS["zs_domain_" + key] = [
+        UserPrompt(get_domain_user_prompt("predictionDocument", key))
+    ]
+    
+# ZS + Extracting Context
+PREDEFINED_PROMPTS["zs_extracting_context"] = [
+    SystemPrompt("You are a helpful, respectful and honest assistant for extracting keywords from the provided document."),
+    UserPrompt(get_default_user_prompt("predictionDocument", "keywords"))
+]
+
+# ZS + Expert Context
+PREDEFINED_PROMPTS["zs_expert_context"] = [
+    SystemPrompt("You are an ontology expert in extracting keywords from the document."),
+    UserPrompt(get_default_user_prompt("predictionDocument", "keywords"))
+]
+
+# ZS + Task Context
+PREDEFINED_PROMPTS["zs_task_context"] = [
+    SystemPrompt("You are an expert in extracting concepts, keywords, and keyphrases from documents. A concept represents a set or class of noun phrase entities or things within a domain. Keywords are concepts that are more important. Keyphrases are important multi- or single words that cover main topics."),
+    UserPrompt(get_default_user_prompt("predictionDocument", "keywords"))
+]
 
 #z = [
 #    SystemPrompt("Hello, how can I help you?"),
