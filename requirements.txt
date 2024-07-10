@@ -11,5 +11,5 @@ transformers==4.41.2
 accelerate==0.31.0
 datasets==2.19.2
 lm_eval @ git+https://github.com/EleutherAI/lm-evaluation-harness@9088a68
-hf_transfer==0.1.6
 sentencepiece==0.2.0
+protobuf==5.27.2
