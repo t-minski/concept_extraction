@@ -253,8 +253,10 @@ class LLMRandomButFixedTraining(LLMBaseModel):
                  with_confidence: bool = False, 
                  batched_generation: bool = False, 
                  extractive_keywords_only: bool = True,
+                 load_in_4bit: bool = False,
+                 load_in_8bit: bool = False,
                  number_of_examples: int = 5):
-        super().__init__(prompt, model_name, revision, with_confidence, batched_generation, extractive_keywords_only)
+        super().__init__(prompt, model_name, revision, with_confidence, batched_generation, extractive_keywords_only, load_in_4bit, load_in_8bit)
         self.number_of_examples = number_of_examples
         self.model_template_name = 'LLMRandomButFixedTraining-' + prompt + '-' + model_name.rsplit('/', 1)[-1]
 
@@ -274,8 +276,10 @@ class LLMRandomTraining(LLMBaseModel):
                  with_confidence: bool = False, 
                  batched_generation: bool = False, 
                  extractive_keywords_only: bool = True,
+                 load_in_4bit: bool = False,
+                 load_in_8bit: bool = False,
                  number_of_examples: int = 5):
-        super().__init__(prompt, model_name, revision, with_confidence, batched_generation, extractive_keywords_only)
+        super().__init__(prompt, model_name, revision, with_confidence, batched_generation, extractive_keywords_only, load_in_4bit, load_in_8bit)
         self.number_of_examples = number_of_examples
         self.model_template_name = 'LLMRandomTraining-' + prompt + '-' + model_name.rsplit('/', 1)[-1]
 
@@ -294,8 +298,10 @@ class LLMClosestTraining(LLMBaseModel):
                  with_confidence: bool = False, 
                  batched_generation: bool = False, 
                  extractive_keywords_only: bool = True,
+                 load_in_4bit: bool = False,
+                 load_in_8bit: bool = False,
                  number_of_examples: int = 5):
-        super().__init__(prompt, model_name, revision, with_confidence, batched_generation, extractive_keywords_only)
+        super().__init__(prompt, model_name, revision, with_confidence, batched_generation, extractive_keywords_only, load_in_4bit, load_in_8bit)
         self.number_of_examples = number_of_examples
         self.embedder = SentenceTransformer('all-mpnet-base-v2')
         self.model_template_name = 'LLMClosestTraining-' + prompt + '-' + model_name.rsplit('/', 1)[-1]
