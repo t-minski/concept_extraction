@@ -256,6 +256,7 @@ class LLMRandomButFixedTraining(LLMBaseModel):
                  number_of_examples: int = 5):
         super().__init__(prompt, model_name, revision, with_confidence, batched_generation, extractive_keywords_only)
         self.number_of_examples = number_of_examples
+        self.model_template_name = 'LLMRandomButFixedTraining-' + prompt + '-' + model_name.rsplit('/', 1)[-1]
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
         self.training_data = list(zip(abstracts, keyphrases))[:self.number_of_examples]
@@ -276,6 +277,7 @@ class LLMRandomTraining(LLMBaseModel):
                  number_of_examples: int = 5):
         super().__init__(prompt, model_name, revision, with_confidence, batched_generation, extractive_keywords_only)
         self.number_of_examples = number_of_examples
+        self.model_template_name = 'LLMRandomTraining-' + prompt + '-' + model_name.rsplit('/', 1)[-1]
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
         self.training_data = list(zip(abstracts, keyphrases))
@@ -296,6 +298,7 @@ class LLMClosestTraining(LLMBaseModel):
         super().__init__(prompt, model_name, revision, with_confidence, batched_generation, extractive_keywords_only)
         self.number_of_examples = number_of_examples
         self.embedder = SentenceTransformer('all-mpnet-base-v2')
+        self.model_template_name = 'LLMClosestTraining-' + prompt + '-' + model_name.rsplit('/', 1)[-1]
 
     def fit(self, abstracts: List[str], keyphrases: List[List[str]]) -> None:
         # embed the corpus
