@@ -6,8 +6,8 @@ models=(
     # "meta-llama/Llama-2-70b-chat-hf"
     # "meta-llama/Llama-2-13b-chat-hf"
 
-    "meta-llama/Meta-Llama-3-8B-Instruct"
-    # "meta-llama/Meta-Llama-3-70B-Instruct"
+    # "meta-llama/Meta-Llama-3-8B-Instruct"
+    "meta-llama/Meta-Llama-3-70B-Instruct"
 
     # "mistralai/Mistral-7B-Instruct-v0.3"
     # "mistralai/Mixtral-8x7B-Instruct-v0.1"
@@ -24,7 +24,7 @@ datasets=(
     # "semeval2017"
 )
 
-output_folder="output"
+output_folder="output_fs"
 log_folder="logs"
 
 # Create the folders if it does not exist
@@ -32,9 +32,9 @@ mkdir -p ${log_folder}
 
 # Define templates
 templates=(
-    "zs_domain_topics"
-    "zs_extracting_context_topics"
-    "zs_expert_context_topics"
+    "zs_domain_keyphrases"
+    "zs_extracting_context_keyphrases"
+    "zs_expert_context_keyphrases"
     "zs_task_context"
 )
 
@@ -50,7 +50,7 @@ do
             echo "Running model ${model} on dataset ${dataset} with template ${template}, output will be logged to ${log_file}"
             
             # Run the command and log the output, continue to next command even if there is an error
-            python3 main.py --models class=LLMBaseModel,prompt=${template},model_name=${model},with_confidence=False,batched_generation=False  --datasets ${dataset} --output ${output_folder} -v > ${log_file} 2>&1
+            python3 main.py --models class=LLMBaseModel,prompt=${template},model_name=${model},load_in_4bit=True  --datasets ${dataset} --output ${output_folder} -v > ${log_file} 2>&1
 
             if [ $? -ne 0 ]; then
                 echo "Error encountered with model ${model} on dataset ${dataset} using template ${template}. Check ${log_file} for details."
