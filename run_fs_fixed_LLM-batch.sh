@@ -20,6 +20,6 @@ do
 	for number in "${numbers[@]}"
 	do
 		# Run the command and log the output, continue to next command even if there is an error
-		sbatch --job-name "fs-${class_model}-${number}" run_fs_fixed_LLM-job.sh ${class_model} ${number}
+		sbatch --job-name "fs-${class_model}-${number}" run_fs_fixed_LLM-job.sh ${class_model} ${number} inspec
 	done
 done
