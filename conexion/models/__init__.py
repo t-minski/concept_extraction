@@ -37,6 +37,7 @@ models_map = {
     "Mixtral_22b_Entities": ("conexion.models.llm_models", "Mixtral_22b_Entities", {}),
     "AdvancedConceptExtractor": ("conexion.models.conex_models", "AdvancedConceptExtractor", {}),
     "GPTEntities": ("conexion.models.llm_models", "GPTEntities", {}),
+    "ResultsLoaderModel": ("conexion.models.results_loader_models", "ResultsLoaderModel", {}),
 
     # llm base
     "LLMBaseModel": ("conexion.models.llm_confidence_models", "LLMBaseModel", {}),
