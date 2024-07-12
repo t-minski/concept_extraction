@@ -9,7 +9,7 @@ from conexion.models.base_model import BaseModel
 from nltk.stem import PorterStemmer
 import spacy
 
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_sm", disable = ['ner', 'parser', 'tagger'])
 logger = logging.getLogger(__name__)
 
 
@@ -117,9 +117,9 @@ def evaluate_transfer_learning(models : List[BaseModel], datasets : List[Tuple[B
                     prf_5, prf_10, prf_15, ndcg, map = evaluate_p_r_f_at_k(predicted_concepts_with_confidence[i], test_concepts[i])
                     
                     # tokenization and stemming
-                    stemmed_only_keyword = [" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase in only_keyword ]
-                    stemmed_test = [" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]) for keyphrase in test_concepts[i] ]
-                    stemmed_predicted_concepts_with_confidence = [(" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase)]), confidence) for keyphrase, confidence in predicted_concepts_with_confidence[i]]
+                    stemmed_only_keyword = [" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase, disable=['ner', 'parser', 'tagger'])]) for keyphrase in only_keyword ]
+                    stemmed_test = [" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase, disable=['ner', 'parser', 'tagger'])]) for keyphrase in test_concepts[i] ]
+                    stemmed_predicted_concepts_with_confidence = [(" ".join([PorterStemmer().stem(tok.text.lower()) for tok in nlp(keyphrase, disable=['ner', 'parser', 'tagger'])]), confidence) for keyphrase, confidence in predicted_concepts_with_confidence[i]]
 
                     stemmed_precision, stemmed_recall, stemmed_f1_score = evaluate_p_r_f(stemmed_only_keyword, stemmed_test)
                     stemmed_prf_5, stemmed_prf_10, stemmed_prf_15, stemmed_ndcg, stemmed_map = evaluate_p_r_f_at_k(stemmed_predicted_concepts_with_confidence, stemmed_test)

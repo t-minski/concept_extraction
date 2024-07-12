@@ -16,8 +16,18 @@ class ResultsLoaderModel(BaseModel):
     def predict(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
         # parse the file with csv and extract "Extracted Keywords" column
         import csv
-        with open(self.file_name, 'r') as file:
+        import ast
+        extracted_keywords = []
+        with open(self.file_name, 'r', encoding='utf-8') as file:
             reader = csv.reader(file)
             reader.__next__()  # skip the header
-            extracted_keywords = [json.loads(row[1].replace("'", '"')) for row in reader]
+            for row in reader:
+                try:
+                    keywords = ast.literal_eval(row[1])
+                    if isinstance(keywords, list):
+                        extracted_keywords.append([(keyword, 1.0) for keyword in keywords])
+                    else:
+                        print(f"Warning: row {row} does not contain a list in the expected column.")
+                except (ValueError, SyntaxError) as e:
+                    print(f"Error parsing keywords in row {row}: {e}")        
         return extracted_keywords
