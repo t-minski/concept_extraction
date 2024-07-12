@@ -143,7 +143,7 @@ class LLMBaseModel(BaseModel):
             raise Exception("Not implemented yet.")
             outputs = model.generate(
                 input_ids=input_ids, attention_mask=attention_mask, # token and attention input
-                max_length=4096,  # maximum length of the output
+                max_new_tokens=4096,  # maximum length of the output
                 num_beams=1, do_sample=False  # make it deterministic -> greedy decoding
             )
             generated_text = tokenizer.batch_decode(outputs, skip_special_tokens=True) # batch decode
@@ -186,7 +186,7 @@ class LLMBaseModel(BaseModel):
             if self.with_confidence:
                 outputs = model.generate(
                     input_ids=input_ids, attention_mask=attention_mask, # token and attention input
-                    max_length=4096,  # maximum length of the output
+                    max_new_tokens=4096,  # maximum length of the output
                     output_scores=True, return_dict_in_generate=True, # also return the scores
                     num_beams=1, do_sample=False  # make it deterministic -> greedy decoding
                 )
@@ -221,7 +221,7 @@ class LLMBaseModel(BaseModel):
             else:
                 outputs = model.generate(
                     input_ids=input_ids, attention_mask=attention_mask, # token and attention input
-                    max_length=4096,  # maximum length of the output
+                    max_new_tokens=4096,  # maximum length of the output
                     num_beams=1, do_sample=False  # make it deterministic -> greedy decoding
                 )
                 generated_text = tokenizer.decode(outputs[0][input_ids.shape[1]:], skip_special_tokens=True)
