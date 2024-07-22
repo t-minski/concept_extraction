@@ -56,4 +56,4 @@ Large language models can understand and generate human-like text. LLMs can be f
 
 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
