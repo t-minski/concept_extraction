@@ -26,17 +26,6 @@ models_map = {
     "pke_Kea": ("conexion.models.pke_models", "pke_Kea", {}),
     
     "EmbedRank": ("conexion.models.EmbedRank_models", "EmbedRank", {}),
-    "KeyBERTEntities": ("conexion.models.llm_models", "KeyBERTEntities", {}),
-    "MultiPax": ("conexion.models.llm_models", "MultiPax", {}),
-    "Llama2_7b_Entities": ("conexion.models.llm_models", "Llama2_7b_Entities", {}),
-    "Llama2_70b_Entities": ("conexion.models.llm_models", "Llama2_70b_Entities", {}),
-    "Llama3_8b_Entities": ("conexion.models.llm_models", "Llama3_8b_Entities", {}),
-    "Llama3_70b_Entities": ("conexion.models.llm_models", "Llama3_70b_Entities", {}),
-    "Mistral_7b_Entities": ("conexion.models.llm_models", "Mistral_7b_Entities", {}),
-    "Mixtral_7b_Entities": ("conexion.models.llm_models", "Mixtral_7b_Entities", {}),
-    "Mixtral_22b_Entities": ("conexion.models.llm_models", "Mixtral_22b_Entities", {}),
-    "AdvancedConceptExtractor": ("conexion.models.conex_models", "AdvancedConceptExtractor", {}),
-    "GPTEntities": ("conexion.models.llm_models", "GPTEntities", {}),
     "ResultsLoaderModel": ("conexion.models.results_loader_models", "ResultsLoaderModel", {}),
 
     # llm base
