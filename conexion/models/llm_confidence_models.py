@@ -3,6 +3,7 @@ from conexion.models.prompt_utils import get_prepared_prompt_as_text, get_prepar
 from typing import List, Tuple, Union
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from sentence_transformers import SentenceTransformer, util
+from tqdm import tqdm
 import random # TODO: set seed in main for all random functions
 import logging
 import torch
@@ -61,10 +62,12 @@ class LLMBaseModel(BaseModel):
         return [self.compute_one_training_data(prediction_abstract) for prediction_abstract in prediction_abstracts]
 
     def gpt_computation(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
+        from openai import OpenAI
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url="https://api.deepseek.com" if self.model_name == "deepseek-chat" else None)
         training_data = self.compute_all_training_data(abstracts)
         assert len(abstracts) == len(training_data), "The length of the abstracts and the training data needs to be the same."
         results = []
-        for abstract, training in zip(abstracts, training_data):
+        for abstract, training in tqdm(list(zip(abstracts, training_data))):
             prepared_prompt = get_prepared_prompt_as_chat(self.prompt, abstract, training)
             if isinstance(prepared_prompt, str):
                 response = openai.Completion.create(
@@ -77,7 +80,7 @@ class LLMBaseModel(BaseModel):
                 )
                 keywords = split_keywords(response.choices[0].text.strip())
             elif isinstance(prepared_prompt, list):
-                response = openai.ChatCompletion.create(
+                response = client.chat.completions.create(
                     model=self.model_name,
                     messages=prepared_prompt,
                     max_tokens=150,
@@ -85,7 +88,7 @@ class LLMBaseModel(BaseModel):
                     stop=None,
                     temperature=0.7
                 )
-                keywords = split_keywords(response.choices[0].message['content'].strip())
+                keywords = split_keywords(response.choices[0].message.content.strip())
             else:
                 raise Exception("Wrong type for gpt.")
             
@@ -230,7 +233,7 @@ class LLMBaseModel(BaseModel):
 
 
     def predict(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
-        if self.model_name == "gpt-3.5-turbo":
+        if self.model_name in ["gpt-3.5-turbo", "deepseek-chat"]:
             result = self.gpt_computation(abstracts)
         else:
             result = self.batched_computation(abstracts) if self.batched_generation else self.non_batched_computation(abstracts)
