@@ -13,6 +13,6 @@ datasets==2.19.2
 lm_eval @ git+https://github.com/EleutherAI/lm-evaluation-harness@9088a68
 sentencepiece==0.2.0
 protobuf==5.27.2
-openai==1.35.13
+openai==0.28.0
 bitsandbytes==0.43.1
 jinja2==3.1.6
