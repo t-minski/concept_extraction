@@ -4,8 +4,34 @@ build-backend = "hatchling.build"
 
 [project]
 name = "conexion"
-version = "1.0"
+version = "2.0"
+requires-python = "==3.11.*"
+dependencies = [
+  "spacy==3.7.5",
+  "en_core_web_lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.7.1/en_core_web_lg-3.7.1-py3-none-any.whl",
+  "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl",
+  "pke @ git+https://github.com/boudinfl/pke@69871ff",
+  "keybert==0.8.4",
+  "yake @ git+https://github.com/LIAAD/yake@0fa58cc",
+  "pyate==0.5.5",
+  "rake-nltk==1.0.6",
+  "summa==1.2.0",
+  "transformers==4.52.4",
+  "accelerate==0.32.0",
+  "datasets==2.19.2",
+  "lm_eval @ git+https://github.com/EleutherAI/lm-evaluation-harness@9088a68",
+  "sentencepiece==0.2.0",
+  "protobuf==5.27.2",
+  "openai==1.90.*",
+  "bitsandbytes==0.43.1",
+  "jinja2==3.1.6"
+]
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["conexion"]  # Adjust if your source is inside another folder
 
 [tool.pytest.ini_options]
 pythonpath = [

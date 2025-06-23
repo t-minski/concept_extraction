@@ -67,7 +67,7 @@ class LLMBaseModel(BaseModel):
         training_data = self.compute_all_training_data(abstracts)
         assert len(abstracts) == len(training_data), "The length of the abstracts and the training data needs to be the same."
         results = []
-        for abstract, training in tqdm(list(zip(abstracts, training_data))):
+        for abstract, training in tqdm(list(zip(abstracts, training_data))[:2]):
             prepared_prompt = get_prepared_prompt_as_chat(self.prompt, abstract, training)
             if isinstance(prepared_prompt, str):
                 response = openai.Completion.create(
@@ -92,7 +92,7 @@ class LLMBaseModel(BaseModel):
             else:
                 raise Exception("Wrong type for gpt.")
             
-            results.append([(keyword, 1.0) for keyword in keywords])
+            results.append([(keyword, 1.0) for keyword in keywords])  # LOL, okay confidence is not implemented for GPT models
         
         return results
     
