@@ -24,6 +24,38 @@ def split_keywords(keywords: str) -> List[str]:
             keyword_list.append(keyword)
     return keyword_list
 
+def merge_keywords(logprob_tokens: list) -> list[(str, float)]:
+    """ Splits a list of LogProbToken objects into a list of keywords and confidence scores. """
+
+    def flush(next_keyword, next_confidence):
+        prev_keyword = "".join(next_keyword).strip()
+        prev_keyword = re.sub(r'^[*,;\s\n]+|[*;,:\s\n]+$', '', prev_keyword) # remove separators from tokens
+        prev_keyword = re.sub(r'^[\-\*\–•]+\s*', '', prev_keyword).strip()
+        prev_confidence = math.exp(sum(next_confidence) / len(next_confidence))
+        return prev_keyword, prev_confidence, [], []
+    
+    result = []
+    next_keyword = []
+    next_confidence = []
+    for lp_token in logprob_tokens:
+        token = lp_token.token
+        logprob = lp_token.logprob
+        
+        next_keyword.append(token)
+        next_confidence.append(logprob)
+        
+        if any(cond in token for cond in [',', ';', '*', '\n']):
+            prev_keyword, prev_confidence, next_keyword, next_confidence = flush(next_keyword, next_confidence)
+            if prev_keyword:  # Only append if the keyword is not empty
+                result.append((prev_keyword, prev_confidence))
+
+    if next_keyword:
+        prev_keyword, prev_confidence, _, _ = flush(next_keyword, next_confidence)
+        if prev_keyword:  # Only append if the keyword is not empty
+            result.append((prev_keyword, prev_confidence))
+
+    return result
+
 def geometric_mean(logprobs: list) -> float:
     logprobs = [token.logprob for token in logprobs if token.logprob is not None]
 
@@ -102,17 +134,14 @@ class LLMBaseModel(BaseModel):
                     temperature=0.7,
                     logprobs=True
                 )
-                choice = response.choices[0]
-                message = choice.message.content
-                keywords = split_keywords(message.strip())
-
-                logprobs = choice.logprobs.content
-                confidence = geometric_mean(logprobs)
+                tokens = response.choices[0].logprobs.content
+                result = merge_keywords(tokens)
+                results.append(result)
             else:
                 raise Exception("Wrong type for gpt.")
 
             # TODO: This is still the document wide confidence, not the keyword confidence!
-            results.append([(keyword, confidence) for keyword in keywords])
+            # results.append([(keyword, confidence) for keyword in keywords])
 
         return results
     
