@@ -4,12 +4,14 @@ from typing import List, Tuple, Union
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from sentence_transformers import SentenceTransformer, util
 from tqdm import tqdm
+from pprint import pprint
 import random # TODO: set seed in main for all random functions
 import logging
 import torch
 import re
 import openai # TODO: move GPT to a seperate file (no need for depenedency if model is not used)
 import os
+import math
 
 SPIECE_UNDERLINE = "▁"
 logger = logging.getLogger(__name__)
@@ -21,6 +23,16 @@ def split_keywords(keywords: str) -> List[str]:
         if keyword:
             keyword_list.append(keyword)
     return keyword_list
+
+def geometric_mean(logprobs: list) -> float:
+    logprobs = [token.logprob for token in logprobs if token.logprob is not None]
+
+    if not logprobs:
+        return 0.0  # or float('nan'), depending on how you want to handle it
+
+    avg_logprob = sum(logprobs) / len(logprobs)
+    confidence = math.exp(avg_logprob)
+    return confidence
 
 
 class LLMBaseModel(BaseModel):
@@ -67,6 +79,7 @@ class LLMBaseModel(BaseModel):
         training_data = self.compute_all_training_data(abstracts)
         assert len(abstracts) == len(training_data), "The length of the abstracts and the training data needs to be the same."
         results = []
+        confidences = []
         for abstract, training in tqdm(list(zip(abstracts, training_data))[:2]):
             prepared_prompt = get_prepared_prompt_as_chat(self.prompt, abstract, training)
             if isinstance(prepared_prompt, str):
@@ -86,14 +99,21 @@ class LLMBaseModel(BaseModel):
                     max_tokens=150,
                     n=1,
                     stop=None,
-                    temperature=0.7
+                    temperature=0.7,
+                    logprobs=True
                 )
-                keywords = split_keywords(response.choices[0].message.content.strip())
+                choice = response.choices[0]
+                message = choice.message.content
+                keywords = split_keywords(message.strip())
+
+                logprobs = choice.logprobs.content
+                confidence = geometric_mean(logprobs)
             else:
                 raise Exception("Wrong type for gpt.")
-            
-            results.append([(keyword, 1.0) for keyword in keywords])  # LOL, okay confidence is not implemented for GPT models
-        
+
+            # TODO: This is still the document wide confidence, not the keyword confidence!
+            results.append([(keyword, confidence) for keyword in keywords])
+
         return results
     
     def get_quantization_config(self) -> BitsAndBytesConfig:
