@@ -106,19 +106,18 @@ class LLMBaseModel(BaseModel):
     def compute_all_training_data(self, prediction_abstracts : List[str]) -> List[List[Tuple[str, List[str]]]]:
         return [self.compute_one_training_data(prediction_abstract) for prediction_abstract in prediction_abstracts]
 
-    def gpt_computation(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
-        training_data = self.compute_all_training_data(abstracts)
-
+    def infer_openai_model(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
         logging.getLogger("httpx").setLevel(logging.WARNING)
         client = openai.OpenAI(
             api_key=os.getenv("OPENAI_API_KEY"),
             base_url="https://api.deepseek.com" if self.model_name == "deepseek-chat" else None
         )
 
-        results = []
-        for concepts in thread_map(partial(self.__api_call, client), list(zip(abstracts, training_data))[:10]):
-            results.append(concepts)
-        return results
+        training_data = self.compute_all_training_data(abstracts)
+        input, output = list(zip(abstracts, training_data)), []
+        for concepts in thread_map(partial(self.__api_call, client), input):
+            output.append(concepts)
+        return output
 
     def __api_call(self, client, data) -> List[Tuple[str, float]]:
         abstract, training = data
@@ -272,8 +271,8 @@ class LLMBaseModel(BaseModel):
 
 
     def predict(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
-        if self.model_name in ["gpt-3.5-turbo", "deepseek-chat"]:
-            result = self.gpt_computation(abstracts)
+        if self.model_name in ["gpt-3.5-turbo", "deepseek-chat"]:  # Commercial models
+            result = self.infer_openai_model(abstracts)
         else:
             result = self.batched_computation(abstracts) if self.batched_generation else self.non_batched_computation(abstracts)
         if self.extractive_keywords_only:
