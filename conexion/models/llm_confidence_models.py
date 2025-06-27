@@ -113,14 +113,13 @@ class LLMBaseModel(BaseModel):
             base_url="https://api.deepseek.com" if self.model_name == "deepseek-chat" else None
         )
 
-        training_data = self.compute_all_training_data(abstracts)
-        input, output = list(zip(abstracts, training_data)), []
-        for concepts in thread_map(partial(self.__api_call, client), input):
-            output.append(concepts)
-        return output
+        results = []
+        for concepts in thread_map(partial(self.__api_call, client), abstracts):
+            results.append(concepts)
+        return results
 
-    def __api_call(self, client, data) -> List[Tuple[str, float]]:
-        abstract, training = data
+    def __api_call(self, client, abstract) -> List[Tuple[str, float]]:
+        training = self.compute_one_training_data(abstract)
         prepared_prompt = get_prepared_prompt_as_chat(self.prompt, abstract, training)
         response = client.chat.completions.create(
             model=self.model_name,
