@@ -3,8 +3,9 @@ from conexion.models.prompt_utils import get_prepared_prompt_as_text, get_prepar
 from typing import List, Tuple, Union
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from sentence_transformers import SentenceTransformer, util
-from tqdm import tqdm
+from tqdm.contrib.concurrent import thread_map
 from pprint import pprint
+from functools import partial
 import random # TODO: set seed in main for all random functions
 import logging
 import torch
@@ -106,45 +107,34 @@ class LLMBaseModel(BaseModel):
         return [self.compute_one_training_data(prediction_abstract) for prediction_abstract in prediction_abstracts]
 
     def gpt_computation(self, abstracts: List[str]) -> List[List[Tuple[str, float]]]:
-        from openai import OpenAI
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url="https://api.deepseek.com" if self.model_name == "deepseek-chat" else None)
         training_data = self.compute_all_training_data(abstracts)
-        assert len(abstracts) == len(training_data), "The length of the abstracts and the training data needs to be the same."
+
+        logging.getLogger("httpx").setLevel(logging.WARNING)
+        client = openai.OpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            base_url="https://api.deepseek.com" if self.model_name == "deepseek-chat" else None
+        )
+
         results = []
-        confidences = []
-        for abstract, training in tqdm(list(zip(abstracts, training_data))[:2]):
-            prepared_prompt = get_prepared_prompt_as_chat(self.prompt, abstract, training)
-            if isinstance(prepared_prompt, str):
-                response = openai.Completion.create(
-                    engine=self.model_name,
-                    prompt=prepared_prompt,
-                    max_tokens=150,
-                    n=1,
-                    stop=None,
-                    temperature=0.7
-                )
-                keywords = split_keywords(response.choices[0].text.strip())
-            elif isinstance(prepared_prompt, list):
-                response = client.chat.completions.create(
-                    model=self.model_name,
-                    messages=prepared_prompt,
-                    max_tokens=150,
-                    n=1,
-                    stop=None,
-                    temperature=0.7,
-                    logprobs=True
-                )
-                tokens = response.choices[0].logprobs.content
-                result = merge_keywords(tokens)
-                results.append(result)
-            else:
-                raise Exception("Wrong type for gpt.")
-
-            # TODO: This is still the document wide confidence, not the keyword confidence!
-            # results.append([(keyword, confidence) for keyword in keywords])
-
+        for concepts in thread_map(partial(self.__api_call, client), list(zip(abstracts, training_data))[:10]):
+            results.append(concepts)
         return results
-    
+
+    def __api_call(self, client, data) -> List[Tuple[str, float]]:
+        abstract, training = data
+        prepared_prompt = get_prepared_prompt_as_chat(self.prompt, abstract, training)
+        response = client.chat.completions.create(
+            model=self.model_name,
+            messages=prepared_prompt,
+            max_tokens=150,
+            n=1,
+            stop=None,
+            temperature=0.7,
+            logprobs=True
+        )
+        tokens = response.choices[0].logprobs.content
+        return merge_keywords(tokens)
+
     def get_quantization_config(self) -> BitsAndBytesConfig:
         if self.load_in_4bit:
             return BitsAndBytesConfig(
